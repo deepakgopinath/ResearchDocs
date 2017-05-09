@@ -1,0 +1,2632 @@
+Research thoughts on shared control polciies. 
+
+SEDS - can model learn policies with one goal. 
+		pros: defined everywhere in the workspace. suits real time applications. if learned properly guarentees proper approach to a goal pose. obstacle avoidance can work if cartesian works. 
+		cons: not working great for higher dimensional spaces. currently works only for joint space. issues of representation (rotation) for cartesian space. not notion of time stamps. There the velocities are always non-zero for any point besides the goal. Therefore not suitable for tasks such as pouring as the pouring motion will start way early and result in spilling water. 
+		Suits better for a single goal. Multiple goals can be dealt with multiple models running at the same and selecting a model at a time based on a confidence measure. 
+
+Issues with current implementation - ALWAYS helps in ALL parts of the state space. Characterize the space in a way that the assistance is switched on in only those areas of the state space where help is absoltely needed or, when the user has gotten him/herself into trouble due to bad control signals generated. 
+Can a measure of ergodicity come handy in characterzing the state space. Not all parts of the state space are evenly visited. If the user finds himself/herself in a part of the space which is not usually visited it might have been becuase he accidently got in that part and now he is screwed over. so in that help him out. 
+
+SEDS is ok with two model. The more models you add to the system, the more robust should be the switching mechanism between models. Once a goal is reached in SEDS, the velocity becomes zero, which sort of implies the end of a task. SEDS usually does not deal with multiple goals and sequencing of goals. 
+
+
+A B C are three goals. Possible sequences. N = 3
+
+ABC, ACB, BAC, BCA, CAB, CBA = 3! = 6 =  N!
+
+S is the strating points. Therefore true sequences is
+
+S (ABC, ACB, BAC, BCA, CAB, CBA ) = 6
+
+Different two point models needed. 
+AB, BA, AC, CA, CB, BC, SA, SB, SC = P(N, 2) + N 
+
+As N increases the number of models required will be blow up. If we assume that once a goal has been visited, that it will never be visited again, we can prune the number of models that need to be switched between after each successive goal has been reached. But thats not realistic (maybe for the case of the experiment)
+
+
+
+Things to try out. 
+
+Learning the models in normlized spaces. 
+
+Data -> normalize -> learn
+Query -> unnormalize -> apply to robot. 
+
+Check quaternion formulation ? Should we try out euler stuff again?
+
+
+Questions
+
+Do subjects like online customization of assistance? Fixed - 'After initial customization no more customization, no need for the interface'
+What customization scheme will they prefer? change alphamax, change cmax, change alpha
+Different customization interfaces for different levels injury? 4 interfaces so far. 
+
+Think about tasks:
+
+Issues with SEDS cartesian?
+
+GMM blows up...Seems like the Gaussians are extremely narrow. Does it have to do with small range of values the data is occupying? Can changing the number of components have a significant impact on it?
+Learn separate models for position and orientation. 
+
+Re read the paper on SEDS to completely understand what all factors can affect the performance..TODO today...
+
+
+
+
+
+New ideas for research (ergodicity)
+
+How can notions of ergodicity be used for characterizing the sttae space so that the assistance is offered only in strategic spots in the state space. The current system suffers from the problem of trying to help out the user at ALL times, which can be domineering and unnecessary. Its like the robot asking the human, can i help you can i help you at all times., This can get irritating. If the system can "understand" those parts of the state space which can be troublesome, maybe assistance can be offered. 
+Understand the state space, involves undertsnading the state of the robot itself and the environment and the relationship of the robots state to the goal. A particular 6D pose of the end effector might be advantageous for some kind of task whereas the same 6D pose can put the user in a disadvantageous position if the task was something else. Think of the long box vs. tea cup. The approach pose is drastically different. 
+
+Ergodicity from a DS standpoint refers to the "average" time the system spends in that part of a state space. If certain parts are not visited that often, it might be because those are troublesome. Higher the ergodicty more the information content of the state is. (Is that really useful, for our purposes. )
+
+Once the state space can be identified, different types of assistance paradigms can be used to offer assiustance. Usually ones which are robust and reactive enough to deal user induced changes.
+
+
+
+
+Ideas related to ergodic control applied to assistive robotics:
+
+1. Select teleop dimension based on measure of ergodicity (or information content) 	which will let us retreive more information regarding the human intent. 
+2. Guide the user execution to that parts of the state space, which has more control options that will get you closer to  (low ergodicity). 
+3. Characterize the space so that when users are in parts of the state space which high ergodicity (less control options to manuevre out of trouble), then offer assistance. In regions with more number of control options, the users might be able to navigate there way out of trouble towards task completion on their own. The concept of information content of the state space, helps us characterize the state space into regions where assistance is needed or not needed. 
+
+
+
+Addressing point 1.
+
+Are we actually interested in ergodicity or are we interested in information content. What exactly are we trying to get etter at by invoking these ideas. 
+Given a particular position of the end effector and a spatial distribution of goals, are we interested in finding that control dimension (same as the end effector dimensionality, usually 3 for translation and 3 for rotation) along with the goal discernbility is going to be the highest? So that 
+
+
+what is a more useful concept for us? ergodicity or information density (along each dimension)? This information density might depend on the relative position of the end effector to the spatial distribution of goals.  
+At every point in the state space, there might be a specific control dimension along which the user can move which will enhance our understanding or make the estimate of human intent unambiguous. can we infer what that dimension is from information theoretic measures?
+
+imagine 2d robot. no oreintation. 
+we have a distribution of goals. represented by phi(x,y). If the goal position are exactly known, the the probablility distribution will be two spikes at x1,y1 and x2,y2
+The end effector is being controlled by the human teleoperation hopefully augmented at the right times to improve performance and reduce cognitive burden. 
+Do we want the end effector to spend more time in the vicinity of these positions? If we want the end effector to have ergodic behavior wrt to the spatial distriubution of goals, then the end effector will spend more times in the vicinity of the goals. 
+
+At every pose x of the end effector there will be a function phi(x) also in 6d, which captures which dimension is the most useful one to look by the system to estimate user info. The user might end up going in some other direction. And now phi(x) will be different. 
+
+The relative positions of the goals in the end effector frame will give us an idea which "dimension" will give us the most information about intent. Consider 2d point goals. And a 2d end effector (at a position in the world with some velocity) with a body frame attached to it. 
+
+Higher entropy the greater the ambiguity. More possibilities are present and therefore greater entropy and greater ambiguity. 
+
+
+INFORMATION THEORY BASED DIMENSION SWITCHING?
+
+The scenario is as follows. Consider an SCI subject using a 1D interface such as a sip n' puff. He/she can only provide one signal at a time. The dimensionality of the manipulation task is at 6D and the limited dimensionality of the control interface will make the task extremely hard. When there are multiple goals in the scene, appropriate assistance can be provided only after the user intent is estimated with considerable confidence. 
+
+This estimate of the user's intent is made by monitoring the control signals that are generated by the user. When the control signal itself is limited this in turn will affect the confidence estimate and therefore the assistance provided. 
+Brenna's idea is to limit the teleoperation dimensions available to the subject at any point, so that the signal the user provides will be unambiguous and will help the system to discern the goals clearly and provide the appropriate assistance to the user. This way the user need not have perform mode switches to provide the most meaningful information for the system.
+
+THink of the exact scenario. 
+
+
+A scenario in R2
+
+Two point goals. The end effector is also a point end effector. There is a frame attached to the world. There is a frame attached to the gripper. The (x,y) positions of the goals with respect to both body and world frames are known. At position in the world, the aim is to find that teleoperation dimension along which the user can clearly indicate to the system,  which one of the two goals that he/she is going for. Its like the user giving the system a hint by nudging the robot a little bit in a direction/dimension which will enhance the estimate and tehrefore the efficacy of the asssiatnce. 
+
+
+A simple scenario.
+One dimensional control. Sip n'puff. Sips and puff to switch modes (select x or y direction), then sips and puffs to control the velocity along a particular dimension.
+
+End effector is in the middle. One goal to the left of the end effector. One goal to the right. There are two options. Go forward/backward. Or go left/right.
+Going fwd/bwd is not going to disambiguate which goal is user is going after in a clear way. But left right immediately will increase the system's confidence which goal is the user going for. If somehow we can capture the fact that left/right is the dimension better than front/back, then the system can automatically switch to the control mode (left/right) and then the user can either go left or right and then the assistance can be provided without ambiguity. 
+
+Questions? Should the teleoperation be happening wrt to body frame or world frame? 
+
+A scenario in SE2
+
+Once again we have two point goals. But the end effector can now rotate as well. In this case should the teleop be happening wrt to the body frame (which can have any orientation wrt to the goals. 
+
+A scenario in R3
+
+A more complicated case in which the control can happen in all 6 dimensions (SE3)
+There are two goals. Both are to the right of the gripper, for example. One of them is a cup and the other is a pen. THe cup can be grabbed in an orientation in which the end effector is parallel to the table. And the pen can be grabbed using an orientation such that the end effector is perpendicular to the table. 
+
+Information theory based mode switching?
+
+
+Week 2 (Spring 2016)
+
+Notes for meetings. 
+
+1. With multiple goals in R2 and with the end effector in SE2, although an angle with maximum variation in x coordinate can be found out, the goals cannot be immeidately distinguished. 
+
+2. There has be to some way to compare "differences" in rotations to difference in translation. How?
+
+3. Should the control signals be treated as "hints" from the user or actual velocity commands that will take the user to the end goal. When num goals > 2 disambiguating between the goals clearly is harder. We can eliminate options as time goes by and the end effector moves closer and closer to the goals. 
+
+4. We force the user to move along a particular dimension because we think that dimension will give us most information regarding which goal he/she is going for and thereby provide more effective assistance. 
+
+5. Is reaching hand centred, eye centred?
+
+
+
+Week 3(Spring 2016)
+
+With a agiven distribution of goals with respect to an end effector position are there patterns to which how reaching motions are performed by the humans. If so, something like that can be used to inform how the demonstration are provided for an algorithm like SEDS. Furthermore, the regions of the state space where the trajectories (the paths which lead to different goals) are the farthest from each other or have the greatest spread, can be used to disambiguate the intended goal better. Is the spread going to be the maximum for the axes along which the goals are spread out the most? 
+
+The answer to whether reaching is hand centred , eye centred becomes critical when we want to the "orient" or make the end effector "face" the goals in the right way? If we want to have the end effector "see" the goals in front of it, then we will need to always have to turn the end effector in a direction such that the maximum spread is seen. Imagine a camera mounted on top of the hand. Would we like to have the camera "see" the goals in front of it at all times. 
+
+I am still consider planaring rotations in SE(3) because all my goals are on a level plane (table top). This actually simplified the problem as well. However when have distributions of the goals such that there is variation along the z axis as well, for example, a kitchen rack with multiple levels, will this still hold. Should we just let the zaxis control to the user at all times. Or maybe the assistance can kick and bring the robot up or down. 
+We can compute the direction in the x-y plane using SE(2) methods and then compare with the deltaspread along z. The choices to pick from will be z or a direction in x-y, thereby maintaining the flat orientation of the resulting frame. 
+
+Characterising the state space based on how troublesome of a spot it is.
+Can we do this based on the number of IK solutions one can obtain at and around the spot? This would just be a function of the state only. The goal distribution will not play a role in whether IK works or not? 
+Troublesome is a concept that can both meanings. 
+
+
+
+Week 4 (Spring 2016)
+Goals in the environment are typically perceived with respect to the body frame. For example, the tea cup is to right side of my body, the box is in front of me. do we ever really think of the goals with respect to the end effector? We might be indirectly when we try to get the ee to the goal. 
+It might me that goals are perceived with respect to the body and the ee is also perceived wrt the body. 
+For example, the goal is to the left side of myself and the current ee is to the right side of myself. Therefore we make the calculation that the end effector has to be moved from right to left wrt my body. 
+
+Are control interfaces just electronic analog of mechanical direct linkages. If instead of a joystick we had a pulley with a rigid rope, regardless of which the end effector is pointing, the direction of motion is dependent on the relative position of the ee wrt to us. Is that how control interfaces work? This notion will probably help in understanding how exactly to remap the teleoperation interface. 
+
+FOr the time being forget about remapping. 
+The essential problem is that of reorienting the wrist (performing the rotation of the ee for the user), thereby also indicating the fact that a realignment has happened? Or will it let the user know a realignment has happened? Because all the user sees is that the end effector has rotated. Nothing has been explicityly done to let the user know that the teleop dimensions have been remapped. Will it be confusing for the user to change the mapping so that the "new" x and "new" y are mapped to the control inerface x and y. 
+
+The way maxTheta is being calculated restricts the theta to be in -45 to 45 degrees. Assuming everything is happening in 1st and 2nd quadrants. Maintaining end effector orietnation along Y will still work. The maximum rotation of the end effector will happening if the end effector is along the x -axis  and the maximum rotation will be equal to 45 if ee is on +x and -45 if ee is on -x. 
+If the ee is "ahead of the goals" (ie y loc of ee is greater than ylocs of goals) it does not make sense to rotate the ee backwards to "face" the goals. The user will have to "pull back" so that the robots are in front of the robot. 
+
+If 1d control interface is being such as sip n' puff after the ee has been oriented the signal will be mapped to that dimension which was picked as the max info dimension. 
+If 3d interfaces are being used, the question of what is "forward"/backward and left/right becomes more crucial. Should the idea of "forward" be always mapped to pushing to the front on the joystick, which can either result in the ee moving forward wrt world frame or result in ee moving forward in ee frame. 
+
+
+Week 5 (2016 Spring)
+
+Redid Matlab simulations for 3 and 4th quadrants. More closer to the real robot coordinate axis. Some edge cases are still being dealt with. There might not be a unique answer
+I am beginning to wonder how useful this is going to be? Should we consult with patients before hand. 
+
+Results
+From our pilot study we saw that the user-driven customization in general improves task performance and helps to reduce the performance differentces between uninjured and SCI subjects. In Figure 2 for the custom assistance type task complteion times are comparable t those of the max assistance type. However the number of ms for custom is greater than that for max. 
+a. provide insight into the fact that the cost function might be more complex. 
+b. People were able to converge to an optimal assistance level and the difference between task completion times for uninjured and SCI drops steadily from tel to custom and is minimized under customization. However for mode switches, blah blah
+
+
+
+Things to talk about today
+
+1. Show Matlab sims. Discuss the usefulness of the approach. Is there a mismatch between what we think the user needs and what the user actually needs. 
+2. Discuss the submission
+3. Seek advice regarding how to go about submitting a position paper. Discuss basic outline
+4. Remind of cloth bag for computer on Monday
+5. What about collaboration with Gil. 
+
+Postponed meeting on Monday - Discussion
+
+1. Show matlab sims. ask opinion about what should be the ideal behavior in the edge cases. What exactly should the system be doing, that is what is the experiment sceanrio and what are we trying to measure during the experiment. 
+All of these attempts still for me tie back to more fundamental questions regarding what are the principles driving people to use robots in a certain way. Given the current goal locations and the current pose of the ee, will the geometry of the scene dictate the next best move. 
+
+We select a dimension "for" the user so that when the user moves along that dimension even for a little bit, our ability to disambiguate between the various available goals will be the highest, there by providing the appropriate model for assistance. 
+what will be a use case sceanrio? How would the user want to activate this module? At what point? After the module has been activated what should the followup behavior be. 
+
+Use scenario:
+The user begins to teleoperate. The user has a button at a disposal which will activate the mode. 
+The goal locations are known beforehand (or comes in through a perception pipeline). The current end effector position can be known from the encoders. Given the end effector position and goal locations, the best new direction and angle of rotation can be computed. Upon activating the mode the end effector will be rotated to the newly calculated angle. 
+The question now is "should" the teleoperation be now (maybe only for a short while) be mapped to one and only direction (the best direction that will give most info regarding confidence). Maybe "how long" should this remaining in that direction can be answered by ergodic concepts? Because now there is time involved?
+
+A confidence metric based on ergodicity. A cumulative measure of how long the person is spending around a feasible path to goal should also have an effect of how the confidence for a particular goal should increase or decrease. Should we assume that the user will always be moving? that will not necessarily work. 
+We can sample the position of the robot when the user command is non-zero. When user command is zero it can probably be interpreted as "rest time". 
+As we sample the trajectory, a distribution of spatial positions occupied by the robot will be cumulatively built. This can be compared to the distribution of the trajectories that will know will work as feasible paths to goals. If the difference between the distributions is high, maybe the goals of the assistance is to bring it closer to the distribution. The "difference" can be used as a metric to dictate when and when not to provide assistance and also how much to provide. 
+
+
+Demo list
+
+CPU, Joystick, Cables, Kinect and Stand, 2 cups and box for cup, 
+
+
+
+CONTROLLER NOTES
+
+Only TwistVel controller and joint vel controller has been implemented in supervisor.py.
+What I ned in this context is the JointPosController, which will take a target joint list as a goal and make the robot move to that goal from the current joint. Does this require planning or can this be done in a brute force way? 
+
+Why is that it was never completed. The unload() function is not present. handle() function does not seem to be complete. PlanningtoConfiguration has been commented out. 
+
+The Rg value is 2.099405
+The m2 is 4.998378
+The std2 is 1.565168
+The se2 is 0.333695
+The upper ci is 5.692335
+The lower ci is 4.304421
+
+
+
+Maybe state the results in terms of maximum probable difference between the two groups rather than claiming statistical equivalence or not. Because the latter is heavily dependant on what the delta value is for the problem at hand. 
+
+We can say that for statistical equivalence it will be desirable to have a smaller value of Rg. 
+
+Why is it not possible to do objective comparison?
+The model is not trying to exactly replicate a human stroke? objective metrics might not make too sense when it comes to the musical side of things. There is not one particular way to play a multiple bounce stroke. It is overall effect that matters. And that can be captured by 
+
+https://engineerjau.wordpress.com/2013/07/15/on-the-basis-of-workspaces-of-robotic-manipulators-part-2/
+
+
+1. Being around the edge of the manipulability ellipsoid is risky. Therefore provide assistance to move it away from the edge. 
+2. Time based assistance. The user can be in not-so troublesome part of the ellipsoid, but maybe because of difficulties in visualization how rotations can affect the end effector, the user might be stuck. The user might end up spending unusually longer time in a region. This might be an indication to come up with a assistance paradigm. Continuously monitor the position and build time evolving histogram (distribution). This distribution can then be "compared" against known successful distribution (may be) the ones from the demonstration
+
+Workspace analysis from urdf might be needed to characterize the workspace. 
+
+Geometry informed mode switch
+
+1. Relative position of robot ee wrt goals. Magic mode switch which will turn the ee in a direction of "maximising spread". Therefore for a the underlying set of robot policies, the separation between the confidences for each candidate goal will be maximized thereby
+
+
+Presentation notes:
+
+Objective: 
+
+Characterizing the workspace (robot and task) to understand when and when not to provide assistance:
+Currently, assistance is present at all times everywhere. THis can possible be too much and obtrusive to the smooth operation of the device by the user. 
+
+Can the geometry of distribution of goals (wrt to the end effector) provide us clues as to provide better assistance?
+Can the topology of the workspace provide clues?
+Can the manipulability index (condition number) of the any given robot be useful?
+
+:Consider single dimensional control interfaces: helps to highlight the difficulty. 
+
+Typically teleoperation dimensions are fixed in space. 
+(This raises another question: Is teleoperation world frame, hand frame or body frame based). 
+But consider a distribution of goals and the existence of assistive robot policies for each goal. 
+Picture. 
+Assuming the robot policies are learned from demonstration. What might be a natural direction of approach to each of the goals. 
+
+  which will turn the ee in a direction of "maximising spread". Therefore for the underlying set of robot policies, the separation between the confidences for each candidate goal will be maximized thereby
+
+The assistance will orient the robot in a direction so that separation of the confidences will be maximized thereby ensuring the right kind of assistance is provided. 
+
+How to determine this direction. 
+Consider 2d robot and 2d plane. The same concept can be applied to 3d robots. Works alright for table top environment. 
+Given a goal distribution: Compute a theta (the angle of rotation of end effector) And remap the teleop to the rotated axes. 
+
+Practical issues, that I might face. Dealing with dynamic switching of controller? Upon activating the mode go from current T to destination T(theta). And then switch back to velocity control mode, with remapped tele. 
+As the user moves in the direction of the goal, the confidence will increase dramatically and then the assistance will take over and bring it goal. 
+Some rotations can be extreme and might take the robot into more weird configuration. But it is a tradeoff. For ease of understanding we can always choose to maintain "forward direction" (the direction in which the hand is pointing) to be the "best direction for maximum confidence estimation".
+There is also the redundancy of whether the end effector should be pointing in +y or -y. 
+
+Give us a hint in the best possible direction and I will take you there. 
+
+
+
+Is the robot workspace geometry related to the "troublesome" spots for user? 
+How close are you singularity? Or even from a pracical point of view, where IKSolver fails or blows. The closer one if to a singularity, the capability to generate any arbitrary velocity and make it move in any directions is limited. thereby limiting the options. THe less number of options someone has, there is a greater need to do the right move. and with limited control, this will be harder and therefore assistance might be a good. 
+
+Goal of assistance: To try to keep the user away from singularities and troublesome spots. But primarily let the user do the teleoperation. 
+This can be thought of characterizing the state space for manipulability and acquiring some sort of information regarding the manipulatibility. 
+
+
+Lastly, How can ergodicity play a role? 
+
+DEfine a spatial distribution that is most preferred scenario. Can be the spatial distribution from demosntrations. Or can be the manipubility map. Essentially any Phi(x)
+
+It is possible that while the teleoperation the user can "touch" upon a "near-singular point". That does not mean that you have tp jump in a provide assistance. However if the user tends to spend more time at a near-singular spot it might be an indication that the user is "stuck". then jump in a provide assistance to steer it away from such a region. 
+
+
+Notes regarding survey:
+
+ However, I do think that more attention could
+be paid to the human factors side of the evaluation, especially since
+you mention that "some subjects favored retaining more control during
+the execution over better task performance" and "Post-experiment
+surveys revealed that users welcomed the customization procedure and
+the end-user satisfaction was also high." In the almost half-page of
+space left, I would suggest that you present the details and results of
+these surveys.
+
+
+We claim that subjects "favored retaining more control" and "welcomed the customization procedure". Can we conclude these from the survey
+
+"...Post-experiment surveys
+revealed that users welcomed the customization procedure
+and the end-user satisfaction was also high.
+"
+Reviewer recommends survey protocols such as USE. 
+
+Questions that can imply "Favoring"
+1. The assistance from the robot was useful?
+2. I can acheive the task more easily with the robot's assistance than without it? (Super confusing question)
+	Should have been. I can acheive the task more easily on my own. 
+
+Questions that can imply "Welcomed"
+
+
+No questions related to customization because it is not grounded in a specific paradigm
+
+
+No explicit question was asked about the customization procedure itself. Questions were essentially related to the effects? of customization and the final assistance provided by the assistance. 
+
+When people rate the assistance (after customization) as being less effective is it  reflection of customization process or fthe system itself. That despit customization the system is not able to give good performance. That is if the system by default sucky, then not matter how hard one customizes, the results are going to suck. So even if the "procedure " is good, the assistance is going to be bad. 
+
+
+In future work mention about more detailed questionaire asking questions related to the customizatopn procedure will be asked once customization interfaces and protocol are made more concrete. Since this was a pilot study we avoided it. 
+
+Utility:
+Can be related to end-user satisfaction? Unfortunately one question had the word satisfaction in it :(. 
+Contribution:
+
+U2
+Contribution:
+
+Q2 - might be related to satisfaction?
+Contribution 4 and 5. 
+
+Trust:
+
+
+
+Capability:
+C2 - if that was low...contirbutes to the idea that robot is doing thw right thing. 
+
+Traits:
+
+Demographics:
+
+
+Or should we just mention in the papetr that we screwed up the questionaire? Then we should not be making clainms about Favoring and Welcoming etc. 
+
+
+
+Presentation Ideas:
+
+Slide 1:
+
+Why do we need customization?
+* Predefined levels may not remain optimal
+* Shared control as a continuum between full teleop and full autonomy
+* Customization will be needed because of variations in user capabilitiy and task requirements
+
+Slide 2:
+Customization as an optimization problem?
+* If beta is the arbitration function between human and robot....and paramterized by theta. 
+* customization of assistance level
+Slide 2:
+Why should it be user-driven customization?
+
+
+***************************************************************************
+***************************************************************************
+***************************************************************************
+***************************************************************************
+***************************************************************************
+***************************************************************************
+***************************************************************************
+
+SUMMER 2016
+
+Why would this paradigm be even useful. 
+
+The rotation happens based on the spatial distribution of the goals. 
+For different spatil distribution of goals the "angle" by which the end point rotates is different. The angle is independent of the relative position of the end effector with respetc to the goals. 
+
+This is thought of as a control-upon-request. But the user is trying to provide hints to the system so that the system in turn can help the user out in a more effective way.
+
+User provides small hints (help signals) to the system which will help the system to disambiguate the goals in a clear fashion and therefore be more confident about the assistance provided and therefore can take over and accomplish the task. 
+
+User helps the robot in a small way so that in turn, the robot can help the user in a big way. 
+
+
+How can this be tested?
+ - the system should be robust to different confidence formulations. 
+ 	- The current algorithm was designed with a SEDS like policy in mind. That is, with 
+ 	preference given to "alignment" of velocities. The end effector position is disregarded altogether which means, any distance based confidence metric will not work great, except only in limited cases. 
+ - the system should be robust against different spatial distribution of goals. 
+
+ Evaluation methodology - No user study.
+ For each spatial distribution, and for each confidence formulation "the preferred angle" approach should be able to generate the best ambiguation between the different goals. 
+
+ Known limitations of the current formulation:
+ 	- The idea for turning the ee was based on the assumption that the "approach" directions towards each goals will spread out in front of the goals and that the confidence formulation is based on the dot product of uh and ur in which the ur is generated from demonstration data that follows the spread out approach directions. 
+ 	This is unfortunately a limited view of things. There are restriction on the assumed robot policy. There are restrictions on the assumed confidence formulation. For example, if instead of the dot product confidence formalism, a simple distance based formalism is used for confidence then the end effector position has to be considered inevitably and furthermore, moving "parallel" to the maximum spread is not necessarily always improve confidence. 
+ 	- The above mentioned limitations will not help when it comes to evaluating on different confidence measure. Furthermore the assumption is that from ANY starting point of the ee the the approach is always going to be spread out in front. Even for a SEDs like robot policy formalism this assumption is not necessarily valid. 
+
+ 	Should the end effector position be considered? And should there be knowledge of the robot policy before hand?
+
+ 	If the confidence formulation depends on the robot policy, then this "help-the-robot-out" system should taken into account the policy too. HTRO system's objective is to improve the confidence disambiguation. Robot policy dependent confidence formulation will give different confidences for different robot policies. The same methodology for "improving confidence" will not work. 
+
+ 	My current system is purely based on geometrical considerations, independent of robot policy and ee position. What kind of autonomy policy and confidence formulation will benefit from such a HTRO system?
+
+ 	Is this a scalable solution with increased number of goals? Most likely not. 
+
+ 	Formally speaking any HTRO system can be formalized as some function of x_r, x_g, u_r and also c. Hopefully not dependent on u_h. Because when the HTRO system is in action u_h = 0 and should not depend on what the user is doing. However subsequently, when the user provides "hints", then uh is not 0.  
+ 	The questions whether a HTRO system should ALWAYS be a function of all the above mentioned variables?
+
+ 	For example in the best angle HTRO system, the "assistance" is only a function of x_g (the goal distribution). 
+ 	Since confidence disambiguation is the primarily goal, HTRO should depend on the confidence formulation and the same HTRO system need not work for all different confidence formulations. 
+
+ 	What are the different confidence formulations:
+ 	1. distance based (Anca Dragan based stuff) - x_g and x_r. 
+ 	2. Dot product of user input and robot policy (Alignment of the control signals) (Gopinath et al.). Can also be in the orientation space. 
+ 	
+
+ 	Should it at least be a functoin of x_g and x_r. 
+ 	THe goal of the HTROsystem is to put the robot in a state so that any subsequent control from the user will quickly disambiguate the intended goal by improving the confidence disambiguation. 
+
+ 	
+The video of the study can be found at http://argallab.smpp.northwestern.edu/index.php/publications/
+
+
+Search directly in confidence space. Formalization sketch in the notebook. 
+
+
+Paper notes. 
+
+Fig 4
+
+Column 2
+
+Uninjured:
+	Time:allObjTCell
+		Task 1: 
+			tel-min - (1,1),(2,1) - there is - p=0.001449 =0.001 (**)
+			tel-max - (1,1),(3,1) - there is - p = 1e-6 = (***)
+			tel-custom -(1,1) (4,1) - there is - p ~ 0 = (***)
+			min-max - (2,1),(3,1) - there is - p=0.021 = (*)
+			min-custom- (2,1) (4,1) - there is - p = 1e-4 = (***)
+			max-custom- (3,1) (4,1) - there is not - p = 0.237 = ()
+		Task 2:
+			tel-min - (1,2)(2,2) - p =(0.002) = (**)
+			tel-max - (1,2)(3,2) - p = 2e-5 = (***)
+			tel-custom -(1,2)(4,2) - p = 1.9e-4 = (***)
+			min-max - (2,2)(3,2) - p =2.1e-3 = (**)
+			min-custom (2,2)(4,2) - p = 0.074 - ()
+			max-custom - (3,2) (4,2) -p = 0.404 - ()
+	MS:allObjMSCell
+		Task 1:
+			tel-min - (1,1),(2,1) - p = 0.09 - ()
+			tel-max - (1,1),(3,1) - p ~ 0 - (***)
+			tel-custom -(1,1) (4,1) - p ~ 0 - (***)
+			min-max - (2,1),(3,1) - p ~ 4e-6 - (***)
+			min-custom- (2,1) (4,1) - p ~4e-6 - (***)
+			max-custom- (3,1) (4,1) - p ~ 1 - ()
+		Task 2:
+			tel-min - (1,2)(2,2) - p = 0.015 - (*)
+			tel-max - (1,2)(3,2) - p ~ 0 = (***)
+			tel-custom -(1,2)(4,2) p ~ 1e-6 = (***)
+			min-max - (2,2)(3,2) - p ~ 0 = (***)
+			min-custom (2,2)(4,2) - p - 3.5e-4 = (***)
+			max-custom - (3,2) (4,2) - p = 0.022 = (*)
+SCI:
+	Time:
+		Task 1:
+			tel-min - (1,1),(2,1) - p =0.019 = (*)
+			tel-max - (1,1),(3,1) - p = 2.6e-3 = (**)
+			tel-custom -(1,1) (4,1) - p = 3.2e-3 = (**)
+			min-max - (2,1),(3,1) - p = 0.051 = ()
+			min-custom- (2,1) (4,1) - p = 0.0692 = ()
+			max-custom- (3,1) (4,1) - p = 0.912 = ()
+		Task 2:
+			tel-min - (1,2)(2,2) - p = 0.139 = ()
+			tel-max - (1,2)(3,2) - p = 2.4e-3 = (**)
+			tel-custom -(1,2)(4,2) - p = 8.2e-4 = (***)
+			min-max - (2,2)(3,2) - - p =0.016 = (*)
+			min-custom (2,2)(4,2) - p = 5.3e-4 = (***)
+			max-custom - (3,2) (4,2) p = 0.296 = ()
+	MS:
+		Task 1:
+			tel-min - (1,1),(2,1) - p=0.003 = (**)
+			tel-max - (1,1),(3,1) - p = 4.2e-5 =(***)
+			tel-custom -(1,1) (4,1) - p=1.6e-4 = (***)
+			min-max - (2,1),(3,1) - 3.7e-3 = (**)
+			min-custom- (2,1) (4,1) - 0.113 = ()
+			max-custom- (3,1) (4,1) - 0.086 = ()
+		Task 2:
+			tel-min - (1,2)(2,2) - p =0.105 = ()
+			tel-max - (1,2)(3,2) - p = 1.1e-3 = (**)
+			tel-custom -(1,2)(4,2) - p = 1.1e-3 = (**)
+ 			min-max - (2,2)(3,2) - 3.5e-3 = (**)
+			min-custom (2,2)(4,2) - 3.5e-3 = (**)
+			max-custom - (3,2) (4,2) - p = 1 = ()
+
+
+
+312-238-7605 - Fax
+
+
+
+Review
+
+1. Provide an overview on your academic/research progress to date.
+
+Review your goals for the current academic year and summarize your progress towards meeting those goals. Outline accomplishments in research, courses, leadership, entrepreneurship and community service, etc.
+
+
+
+Please limit your response to 250 words or less.
+
+2. Independent Research: Please rate yourself and provide a brief justification.
+3. Effectiveness in Communication: Please rate
+4. Work ethic: Please rate and justify
+5. Collaborative Teamwork: Please rate and justify
+6. Goals for Academic/Research Progress for Upcoming Year
+7. Comments on Experience
+8. Research Topic
+
+
+
+
+
+***************************
+***************************
+***************************
+
+Three levels of assistance
+	Control Mode Selection
+	Control Dimension Selection
+	Goal Selection
+
+From 1-3 user freedom reduces and may get in the way of the user's way to express his or her intent (epxressing intent refers to the particular way in which a user chooses to accomplish the task. for example, the particular strategy, rotate first, translate second or translate first and rotate second, straight line translation paths or paths similar to human hand approaches). 
+
+But from the perspective of the robot going from 1-3 implies there is a greater confidence disambiguation, ie., the robot has a better idea of what the intended goal is. So a progression from 1-3 happens only if there is a stronger confidence prediction at each level. 
+
+For example, say there are two control modes: a translation and rotation. If being in rotation mode helps in better disambiguation, it would be great for the robot if the user is operating in the rotation mode. This will help the robot to predict the goal earlier and thereby provide appropriate assistance. but its quite possible that the user has a strategy of translate first and then rotate. which means the user's preferreed mode for expressing his/her intent is translation. If the robot chooses the rotation mode for the user, then the user has to compromise. If we can quantify the "loss" in expressive ability in choosing the rotation mode and then juxtaposing it with the "gain" for the robot for being in the rotation mode, then we can probably make a decision as to whether staying in rotation mode is advisable or letting the user to do whatever he/she wants to do. 
+
+Why do people prefer to be in certain control modes? Is it the immediate benefit (getting to the general goal region faster, therefore be in translation, or is it planning ahead and making the ee orient itself in proper orientation early enough so that there are no troubles at the end [such as no room for manuevering around etc])
+
+Can choice certain control modes be formalized using reward theory?
+
+Given a particular goal, can we model how users pick control modes and then control dimensions in which they will operate? If we can then that will help us evaluate the value of being in a particular mode or dimension. We already know the value from the robot's perspective (in terms of confidence disambiguation). But what we are interested is in the TOTAL value. Confidence disambiguation for robot+Expressive Ability for human. 
+
+Why do users prefer being in certain modes at certain times? To achieve immediate goals, to plan ahead, to express their intent in the most expressive way?
+
+Maybe we can learn these models from user data. Collect data on N tasks. Learn models?? And then apply it to other M tasks. (Siddarth's idea of learning mode switches based on ML). The question of "when" to step in can probably be dealt with real time histogram approach which will hopefully indicate that the person is stuck in a region for long. "what" kind of assistance (control mode selection, control dimension selection or goal selection can be made using the value approach. )
+
+
+
+Should this be viewed as an inverted assistance paradigm...The robot knows what to do. Just a little confused about which one to go for. Maybe human can assist in that aspect. Is this implying that the humans will be more passive in task accomplishment?
+
+
+Have assistance providing happening in rotational mode as well? How should alpha be modulated? Should it be confidence based? Should the arbitration function play a role in it as well. 
+
+
+******Meeting notes/questions
+
+1. Are we dealing with a decision theoretic problem here? With different levels of decisions that needs to be taken based on the cost and the utility of each level?
+
+Sidd's idea of learning mode switches from ML is about understanding when a user would perform a mode switch while accomplishing a task. 
+
+My idea of mode switches is not just about performing the mode switch for the user in such a way that it aligns with what the user would normally do. It is about striking a balance by finding a control mode which will let the user express him/herself (that is replicate what the user would normally do) and which will be beneficial (in terms of maximal confidence disambiguation) for the robot. For examples consider two control modes A and B:
+	For A:
+		Utility for Robot = 6
+		Utility for human = 2
+	For B:
+		Utility for Robot = 4.5
+		Utility for Human = 4.5
+	That is in A, the confidence disambiguation capability of the robot is high and is 6 where the user does not prefer to be in that mode at that time. 
+	However in B, the utlity for robot was reduced by 1.5 whereas utility for human was increased by 2.5. Therefore the total utility improved in B and there being in B might be best for overall benefit. 
+
+	Are the utilities for robot and human, belong to the same vector space? Are they just scalars. Can we just add them? What are the units? Are these relevant questions? 
+
+
+In both types of assistance: control mode and control dimension, when will the goal directed autonomy be applied is another question? Will the blending be again controlled by the confidence level, like in the standard velocity blending paradigm that we already have? Will it start blending the robot autonomy with the user commands right after a non-zero input command is issued in the current best control mode/control dimension which has the highest combined utility? 
+
+How to exactly compute the utility of a control mode/control dimension for the robot?
+	Maybe based on the confidence disambiguation capabilities of control mode.
+
+How to exactly compute the utility of a control mode/control dimension for the user?
+
+	Should this just be based on what contorl mode/dimension the user prefers to be in at that moment? If so, probably Sidd's idea of using ML can come handy. But this seems to not able to rate the different control modes, but rather only would tell what is the "only" control mode that the user prefers to be in. Is this similar to learning the value function? Can this be done from examples? Reward function learning from examples. Is this what we want. 
+
+
+Is task accomplishment possible with any sequence of control modes? If people don't have a preference as to which mode they have to be in then the utility of any control mode for the user is always the same? This is most likely not the case. 
+
+How should the system decide between whether it should offer control mode  or control dimension based assistance. In control dimension assistance, it is posisble to have a "rotation of frame", inspired by geometery of goals wrt to the ee? One possible way of accomplishing this. 
+
+TODO:
+	Extend velocity blending to function also in rotation mode. 
+
+
+The term expressive capability encompasses everything that the user considers when he or she chooses to be in a particular control mode or control dimension at a particular time. 
+
+What kind of nudging can be done? Query the user for user's utility value (expressive capability) of being in the chosen control mode/ control dimension? How can this be effectively quantified and communicated? Or can this utility value be computed automatically based on some previous information, geometrical considerations, ability to achieve the goal (task completion) from that control mode...?
+
+By default: user is in full control. 
+Upon request: The system selects an assistance paradigm: either control mode selection or control dimension selection. Based on the total utility for robot and the human
+Once this has been done, actual amount of help can be modulated using the confidence. Or it can be modulated by a measure of how much in trouble the user is
+WHEN should the assistance be provided can be decided based on histogram approach which gives us an idea if the person is "stuck" and is having trouble manuevering the robot around. 
+
+
+IEEE stuff
+CASE presentation
+
+Reimbursement?
+
+
+
+********************************
+
+The scenario explained:
+	1. The user is teleoperating and requests for assistance. In Sidd's work, the assistance is in the form of automated mode switching. Furthermore the system tries to switch to those modes which the user had used during the demonstrated examples. The assumption is that the machine learning model (SVM, neural net) is learning the mapping between robot state and the current mode. Moreover the mode switching done by the system is done automatically rather than upon request. 
+
+	But what I am envisioning is slightly different. Lets assume that the assistance provided by the robot is that of switching modes. Instead of just switching to a mode which the user would have operated in, the robot will switch to a mode that will be most "beneficial" for itself. Beneficial is in terms of the confidence disambiguation. Being in that mode will help the robot to distinguish between the different targets a lot better. This depends on whether the confidence formulation has any component that is present in the mode. that for example if the confidence formulation was purely based on the translational distance between the end effector and the goals, any change in the rotational dimensions will not affect the confidence disambiguation. Therefore rotation mode will never be chosen by the robot for it of no use to itself. 
+
+	According to Brenna, at this point the user is "obliged" to accept the help offered and be fine with operating the robot in whatever mode the robot chose it for him/herself. Should this be case? Should we disregard altogether what the user feels like to be operating in the robot suggested control mode (or maybe even control dimension). Furthermore if we are going to force the user and make him operate in whatever the robot suggests (according to its own selfish interests) should there be any consideration as to whether control mode is better than control dimension. 
+
+	Note: Here i am making the assumption that a control mode is a subset of control dimensions. For example, various teleoperation interfaces. Control modes can also be something like Mode A: specify goals B: Specify speeds...blaah blahhh...
+
+	Is there a reason why users would request assistance in the first place? Is there a minimum task difficulty threshold below which no assistance will be requested. In which case the entire system will not be used at all. If a request has been made by the user, the robot will offer assistance in the form of picking a mode  or a contorl dimension. However the user will have the capability to override it any time and move ahead with his/her own plan. 
+	Wouldn't it be nice that the user never rejects the help offered by the robot? This would imply that the robot is not just aware of its own selfish interests, but also the user's preferences and that in addition to being useful for itself it will also make sure that the user does not have issues accepting the help. This can be done only we can model the user's value function for each one of the modes or control dimensions. 
+	Users Value function for mode: What is the value/utility for the user to be in that control mode/dimension. And value most likely will be determined by "successfully, easily ...." will the user be able to accomplish the task he/she has in mind from that mode. For example, if the user didn't care about which mode he/she is in and is capable of accomplishing a task in equally effective ways irrespective of the mode, then the value function for each mode will be the same (there is no particular advantage to be in a particular mode).
+
+	Value for the user to be in that control mode given the current state. This is what we want to know. This will temper the "selfish" decision made by the robot. 
+
+	Value is more than just preference. Value is not just about what mode he/she is in when he/she usually teleoprates. That would be a binary value function. All or nothing at all kind of stuff. Value also incorporates the user's knowledge that the robot is also trying to help him/her out. And also maybe the user's trust in the robot's assistance system. 
+	For example, if the user has higher trust in the assistance system, then despite the inconveneince in operating a mode that was suggested by the robot the user might still accept the mode. However in some cases the "inconveneience" might be too high that the user will reject the help offer. 
+	Ideally the goal is for the robot to provide help that will never be rejected. So at the end it will still ensure better task performance with good user satisfaction.
+
+	How can we learn the value fucntion for the user. Can MaxIOC kind of techniques be useful for this? Can this be online learning? 
+	Let V be the utility function.
+	V: CM, X, G -> R
+	Make S = X * G
+	Then, 
+	V: CM*S -> R
+	That is given the current control mode CM, and the system state S (which includes the goal) this function assigns a scalar value which can probably be intepreted as 
+		a. how convenient (user satisfaction) it is for the user to be in the control mode
+		b. how expressive (ease of executing a task specific strategy) the control mode is for the user
+		c. how useful is to be in the corresponding control mode in reducing the task completion time and other objective metrics. 
+
+	How are utility functions designed in decision theoretic formulations? Is this similar to the cost function/reward function structure in MDP type formalisms. Learning reward functions from data is the field of Inverse RL. Dvijotham et al. have another formalism in which Linearly Solvable MDP's are used. 
+
+	Why should we expect the user to reject the assistance offered at all? After all, did he not want some help? Only if the assistance offered is so terrible that the user is better off without it? 
+	Would it be akin to a scenario in which Person A asks for help from Person B and then the help offered be Person B was so terrible that Person A says "No thanks, I think I can manage". How often will such a scenario arise in this domain? Do humans have such "high" expectations of robots. Or anything more than nothing is going to be fine? 
+
+	How can we justify that an assistance paradigm (selecting the appopriate control mode/dimension) that is just greedy to the robot's needs is what is required? 
+
+	Brenna's comments about how we will never be able to learn the entire the state space: Is it necessary as a start to be able to cover the entire state space? Is there something like learning only a selective part of the state space that is probably seeded by demonstrations? 
+
+	We are interested in value of being each control mode. During the data collection stage, if we offer some form of assistance and then if the user rejects it then a reward of -1 can be assigned. But if the offer was accepted then the robot's choice of control mode was acceptable to the user and a reward of +1 can be given. As long as rejection does not happen we are fine the robo will always pick a control mode that will maximize its own needs (confidence disambiguation).But if a rejection happens then the best choice for robot will not work. 
+	The goal will be to provide an assistance that will be bets for the robot AND will not be rejected. 
+	Alternate options for representation of state variable. 
+
+	CM * (end effector cartesian wrt goal) * G ?
+	CM * (distance) * Rotation * G ?
+
+	Is proximity always going to play an important role in confidence determination? If so, then the distance of the goal from the end effector will always play an important role in determing the value functions etc. Either it can be a scalar, or cartesian coordinates of the ee wrt to the goal, or the cartesian of ee and the goal wrt the world frame (the last one is most descriptive).
+
+
+	******************************************
+
+	GSTS approval
+	PubMed for NIH?
+	IEEE has been taken care of.
+	Why acting greedily wrt robot is not a theoretically sound paradigm? We can always just do it and do a study and collect data and say something.
+	Trying to model the scenario. Borrowing concepts from proposal. Little more sophisticated than that because of the "assistance upon request feature". Assume the "help" is in the form of mode switches. 
+
+	NavTech Demos - 16th. 
+
+
+
+	ReiMo - for new autonomy paradigms. 
+
+	New formalisms for velocity blending that is more generalizable than SEDs. 
+	Using planners that can re plan fast enough so that it can be used for velocity blending. The planner should be able to plan to any goal from any part of the workspace immediately. Can there be a notion of a plan following a demonstration as closely as possible? Will it be possible to provide demonstration from all parts of the workspace to the goal. The planner wil generate a trajectory to a goal. From the trajectory the "velocity" required at a given point in the space can be determined. 
+
+	Look into moveit planners and what they do. Can we do do cartesian planning? How can obstacles be avoided. Is this we(ll integrated in the moveit? How fast/successful is the replanning? Would RRT based planner lend it itself naturally for this kind of aplication?
+	
+	
+		Concrete ideas for software implementation of the system.
+	
+		Components of the conceptual system. 
+			1. Assistance in the beginning. The robot starts itself off in a control mode that is of high utility for the robot. And the user is REQUIRED to operate in that mode. This is a deal, an understanding between the robot and the user that is preestablished. That is the user cannot "reject" the assistance outright. Of course, there will always be the option to override any system behavior for the user. 
+			2. Assistance is requested by the user at any point during task execution. The robot computes the best possible control mode and puts in the robot in that control mode. The user then is REQUIRED to continue to operate in that mode. At any point he can override the assistance. 
+
+
+			3. Maybe, in addition to assistance upon request, "statistical measures"/histogram approach can probably be used so that the robot 'intelligently' steps and provides assistance without an explicit request from the user? (will we shoot ourselves in the foot by further staying out of the way?)
+ 	
+			Should we still be having the velocity blending paradigm hopefully in which the blendin gfactor is decided by the confidence. Since in the control mode chosen by the robot the confidence disambiguation is high (by definition of the utility function for the robot), most likely the intended goal will be clear. 
+
+
+			Each object might have multiple candidate poses. This can be taken from Siddarth's work maybe. Each candidate pose can be treated as a separate goal because the robot policy that will achieve each one of the candidate poses will be different. Maybe?
+			We do not in advance which pose the user will be going for when he/she tries to reach an object. Therefore maybe we can group all the "disambiguation calculations" for each goal together before computing the max and argmax. 
+
+			The computation of best control mode assumes that the projected actions are going to result in positive change in the coordinates. An explicit knowledge of the gradient of the confidence function is not required as the delta in the confidence (the change which is equal to the gradient) is computed by "forward" projection. Is "backward" projection important as well? The control mode that will "maximize" confidence disambiguation will be different backward and forward projection. We do not know which way the user is going to move. Should we consider a weighted sum of forward and backward? Or should we keep track of history of trajectories and see whether how much forward and backward has happened? and thereby weight the current forward and backward projections based on the history?
+
+
+			Software requirement:
+				This assumes the existence of a robot policy u_r for each grasp for each goal. 
+				(This can probably be one of the hardest steps)
+				What options are available?
+					a. Fast planners that does continuous optimization. That is, if the user commands takes it away from the current planned path, it will be able to replan within the next time step. Further more the plans generated by the planners should have some sort of continuity and can't be crazy. Cartesian straight line paths are the simplest. ReiMo can possibly do this. Integrating obstacle avoidance in a seamless way. RieMo - Integrated obstacle avoidance. In the absence of obstacle RieMo reduces to shortest distance Cartesian planning in 6d? If ReiMo reduces to a simple shortest path planner in the absence of obstacle then why wouldn't a simple velocity based planner work. That is all robot polciies would effectively be about moving in a straight line from the current position to the goal. If we use planners, and if we plan to "blend" velocities the plan should contain instantaneous velocity. Hopefully all planners can give instantaneous velocities once it has generated a plan. 
+
+					b. Currently Moveit based planning is not fast enough to deal with this. CArtesianComputePath does not work great as well. Cannot deal with obstacles as well. MoveIt Planners - Issues to be dealt with are fast re-planning capabilities (continous optimization) and fidelity of the resulting plans. What safety and "intuitive" guarantees can be there for these plans? Most planning happens in joint space. 
+
+					c. Alex's idea - A* with IK and obstacles incorporated as constraints. Shortest path. How fast is this when it comes to replanning
+					d. Continue with SEDs. But try to make it more robust (how much will we gain from this)
+					
+					f. RL based approaches for robot control. LEarning a policy. Guided Policy Search? where the guide comes from teacher demonstration. possibly can use online data to improve the policy and adapt it to individual needs? Will this possible generalize better than a learning algorithm than SEDS? In order to deal with the state size issue, maybe restrict the state space for RL to just translation. Rotation of end effector is the user's responsibility?  Learning velocity based control policies. Sergey Levine's works can probably be inspiration. The goal is to learn some "Completely autonomous" policies. Would be great if the learned autonomous policies have some similarities to the human policies so that there will be better sharing of control and less fighting for control. 
+
+					g. Potential fields for manipulators. 
+
+				Detecting button press should 
+				a. trigger the calculation of the best control mode (based on fwd/backward projection or a wieghted sum of both maybe)
+				b. should switch the mode to the best control mode. Notify the user that the mode has been switched to the "best" mode. 
+				c. turn on blending (or whatever assistance paradigm is going to be used). not bypassed anymore. 
+				d. set a global assistance flag to be true. 
+
+				Regarding how exactly to do the assistance upon request?
+				a. This can be a button on the joystick as well? But that won't scale well for other interfaces. therefore a separate button (like the customization interface might be useful). Siddarth's ROS code on arduino on button interface can probably be reused. 
+
+				The node which deals with the calculation can "listen" to the button state and trigger the calculation upon a press. once the computation is done, this can trigger a mode switch change. Should this affect the self.mode variable in joy3axis or should this be another node which comes after the joy3axis node. (to be thought about)
+
+				Service to do the best control mode computation that will be triggered upon button press or launch of the system (for scenario one). 
+
+				Use RobotState. USe /joint_states to update RobotState 
+				Use RobotState in ComputeFK to get current position.pose.position.x,y,z. Do forward projection for each dimension. There has to be some way to standard projections along different types of dimensions for comparison. 
+
+				NMaybe a service to compute confidence for any pose is required. Needed for forward and backward projections. The difference between this and and the current confidence is what approximates the gradient of the confidence function. 
+
+
+
+				
+			Meeting notes. 
+
+			1. Questions regarding outline for presentation. I will add more boxes etc for graphs when I am talking. Make new videos. Clips. 
+			Pictures or tables for 2D vs 3D mappings. Should I talk about robot policy?
+			Tone down the use of the term optimization. 
+
+			2. Talk about alternate policy plans. RL is being used for robot control. people are trying to deal with the explosion of state space. Guided Policy Search (Trajectory optimmization seeds the policy search. Instead we can possibly have demonstrations seeds the search. RL approaches might be able to achieve the generalizability that we are striving for). Setup meeting with Nathan if possible? Alex can possibly be part of it. 
+
+			3. What do you think about Elliots suggestions? starting at different init points, test whether they converge to the same place. Hand craft a cost function and see if the optimal parameters computed will indeed work. Altho system dynamics is an unknown.
+
+
+			What can be done in simulation for testing this system. 
+			Whether the the selectiuon of the control indeed results in increase of confidence disambiguation? 
+
+			In simulation randomly initiliaze goals? Shou;d we have humans perform anything (possibly yes). If not, how are we going to know about the "intended goal?"
+
+
+
+			setup gazebo workspace. mico_base. with simulations. try to get button press happening on arduino. 
+
+
+
+			make your project repo on github. clone it into local folder. 
+			cd into the project repo. 
+			mkdir src
+			cd src
+			catkin_init_workspace
+			then,
+			git submodule add "https://github.com/argallab/mico_base.git" mico_base (This will oullk the base repo into a folder called mico_base within the src folder of your project folder.)
+
+			project_folder
+				src
+					mico_base
+					behavior_1
+					behavior_2
+
+			check
+			git submodule status
+
+			commit 
+			git commit -m "added mico_base"
+			git push origin master
+
+
+			2nd regular lab meeting
+			september 8 - 10am lab meeting
+			september 14
+			october 14 - scott neikum
+
+
+			2 - slide. motor impaired (people), 1-2D (for head array), throw in a picture of joystick - Done
+			3 - Change title  to customization -  Done
+			4 - Flip the equation sizes. Talk about system dyanmics. talk about optimization is only on part of the space - To be done Motivate it better - rich math framework. Inspiration from Motor control. Bullet for each of these. Elaborate on the fact the user is perfroming the optimization and that we are not using DP ir LQR kind of techniques to solve this. We are only situating this within the framework of optimal control control. 
+
+			5 - fix spacing. possibly take right fig - to do
+			6 - dont dwell on mappings - sure
+			7 - talk about mico. pop up joystcik faster - Done.
+
+			9. pop up mode switches plot. never saw statistical diff in mode switches -Done
+			10 move cost function to second result - Done
+			12 no boxes only popups. skip exa - Done.
+
+			Questions for Brenna
+
+
+
+			Why that shape for arbitration function? Also read Anca's Paper
+			Why is that max is guaranteed to be better than custom when it comes to objecive metrics?
+			Make notes regarding surveys. How do we defend the quality of the surveys?
+
+
+
+
+
+			Plenary Vijay Srinivasa
+
+
+			Energy and Peak Power Optimization of Robot Trahectories
+
+			AREUS
+
+			rapid accel., heavy braking, unnecessary stops. - all energy wastage
+
+			no dynamic model required. 
+
+			offline imporavemnt of vel/accel profiles. record the time optimal solution and optimize it further. specific to KUKA? why?
+			path remains the same. 
+
+			no models
+			accel^2 as energy measure. 
+
+
+			potential fields for uav - brenna's session
+
+			ePFC -Extended potential field controller for drone. (Unmanned autonmous systems)
+			Assume UAV has sensing and control....Localiszation is possile. UAV uses CV or LIDAR. 
+
+			Dynamics targets etc...reach location quickly. time optimal. 
+			should have dynamic obstacle avoidance. 
+
+
+			How you avoid local minima. 
+
+			Traditional attractive potential. 
+
+			1/2 eta 1/p^2
+
+			no repulsive effect beyond sensing range. 
+
+			Trust:
+
+
+			todd
+
+
+
+
+
+			 
+
+
+beta parameterized by theta. input layer consists of uh and ur and output layer is also u(t). 
+Can this beta be represneted using a neural network of aany other function approximator. 
+
+		
+Presentation ideas:
+
+describe the formalism. approximation of the confidence gradient. pairwise distances. the dimensions within the mode are chosen as the representative dimensions for all possible directions within the mode. 
+
+possible expeirmental set up.
+
+No mode switch assistance. (confidence based blending is always present)
+Mode switched right in the beginning. 
+Mode switch upon request. 
+
+Different interfaces: 
+	1. 3d joystick
+	2. 2d joystick
+	3. sip n puff with 1d mapping? or 0.5d mapping.
+	4. Joystick button? Like head array
+
+What to look for?
+	The more limited the control interfaces, the greater will be the need for mode switch assistance. 
+	since mode siwtches are made greedy to the robot's behavior, success rates are higher?
+
+Possible modifications? 
+	Right now the forward projection happens only for one step? Maybe the next step the effect is much worse thereby altering the answer. Should there be a eligiility trace kind of thing going on. How many steps into the future should one look at?
+
+
+
+Updates:
+
+	1. Primarily looked at potential field approaches for robot policy. Implemented basic obstacle avoidance, self collision strategies. Both rotational and translational attractors were implemented. 
+
+	Ideas for evaluation:
+
+	1. Across interfaces - How does different interfaces affect the frequency of assistance requests and how much (time and mode switch) benefit do we get by performing the mode switch. 
+
+	2. Simuloation based evaluation:
+		For a control m_p, there will be one (or more) control dimensions that will be accessible. For evaluating the utility (in terms of confidence disambiguation), we are only looking at confidence gradients along the control dimensions of a particular mode. However, in a particular mode, multiple control dimensions can be controlled simulatenously (for example, in a joystick), in which case the "actual" motion of the robot will not just be in the specified control dimensions but a "vector" sum of the different dimensions
+
+		Possible evaluation:
+		1. That indeed looking at only the confidence gradients along the control dimensions that constitute the control mode will characterize the entire control mode. 
+
+		We can compute the confidence for each goal will vary if the user were to JUST continuously move along a particular control dimension in a mode. We can also compute how the confidence disambiguation function is going to vary if the user were to continuously move along a particulat control dimension in a mode. We can therefore sum up the confidence disambigutaions for all control dimensions that constitute a particular mode. At every time step along this full projection we can compute what the argmax mode is. If this argmax does not change over time AND is same as the argmax for one (or posibly few steps) projection then its shows that the idea of only looking ahead a little bit is good enough. 
+
+		Show that maybe a few steps look ahead is good enough instead of full projection along the entire control dimension. If both yields the same results thats good. 
+	3. Subjective evaluation:
+
+		1. Which interface was the hardest? 
+		2. For which interface was the assistance paradigm the most useful?
+		3. Was the mode picked by the system appropriate enough to express your intent? 
+		4. How often did you want to be in a mode different from that picked by the system?
+		5. Which scenario was the most user friendly?
+
+		Correlation between 1 and 2 gives us an idea of when such assistance on request is more useful. 
+		3 and 4 hopefully will give us a sense of how much "mismatch" or "dissatisfction" the user had when he/she was "forced" to operate in a mode. 
+
+
+
+	4. Study ideas
+		Brenna's suggestion was to have confidence based blending at ALL times. 
+
+			Three different scenarios:
+			1. No mode switch assistance. Mode switch by the user directly. But blending will be happening tempered by confidence
+			2. Mode switch happens right in the beginning: The initial mode will be the one which will the "best" mode. User starts of operating in that. (this can probably be thought of as an aggressive strategy. Robot trying to be selfish right at the outset, might affect the user satisfaction, because user is not given a choice!)
+			3. Mode switch happens upon request (maybe better, because the user has control over when the mode switch assistance is activated. The user might do this only in dire situations). 
+			4. Should we have a scenario where the blending also starts once the mode switch happened? Until then pure teleop.
+			5. 
+
+		It is important to randomize the initial mode in which the system starts or else it will create a bias in the way the mode switches are performed and how the assistance might be requested. 
+
+	5. Sofwtare stuff:
+
+		1. How to communicate to the user what the system selected mode is (and probably also have continuous feedback as to what mode the robot is in)? What is the best feedback method?
+		This will be crucial for more limited interfaces and mappings in which there are more than 2 or 3 operational modes. 
+
+		2. The arduino button code seems to be present in interfaces_mico. However the circuit has not been build?
+			a. Related concern. If a button is being used for request assistance it is being assumed that the user "can" actually use their hands to press a button. But that is only sensible for those control interfaces, in which the user uses their own hands in the first place. 
+			b. Does this mean that for a control interface such as sipn'puff and head array, the "request for assistance" itself should be generated from the interface (which will further limit the options available for control).
+
+	Meeting:
+		1. Oz stuff has been taken care of
+		2. Dan Popa's interest. Not directly related. Still interested in possible collaboration maybe?
+		3. Gil's paper.
+		4. Potential field. Working. Is there a standardized pick and place task set? How are motion planning and robot policy mechanisms evaluated? YCB 
+		5. Other ideas for study, evaluation. 
+
+		USACPRIFP2U16C
+
+
+ ****************************************************************************************************************************8
+	This week: Week of Sept 5th
+
+	Potential Field:
+		1. possibly start another file for pfields
+		 - Implement multistgae trnanlsation and rotation - Done
+		 	Although this might have spurious effect on the confidence calculations. To be thought about. 
+
+		- over-the-top orientation when going across (only when the line connecting the ee and the goal passes through the base cylinder, otherwise its not close) - Done
+		-  Multiple obstacles -  done
+
+		TODO:
+		Table repeller. Need to be a little smart. If the ee iis pointing downward then the fingers can ram into table..so maybe check that as well. 
+		- understand why graident around obstacle should give rise to the metric described in the paper
+
+		2. Look at YCMU dataset to see if scene descripotions make sense.  If not, try to think of scenes which will help in generalizing the various challenges in potential field. 
+		A: Different classes of objects have been identified however there are no standardized scenes for table top manipulation to test different robot policy generators. Should we come up with one?
+
+		TODO:
+		Come up with some scene geometries? Arbitrarily. 
+		Look into modifying the sip n' puff node to incorporate the "request action as well in each mode"
+
+		Write blurb:
+
+		In this work, a system for mode switch assistance has been developed. The goal of this system is to pick the appropriate control interface mode which will ensure maximum confidence disambiguation between the various goals in the scene for the system, at any given time.  By letting the user operate in the mode picked by the system, the user will be able to "reveal" his/her intent in a more clearer fashion thereby helping the robot to pick the correct goal with higher confidence and provide the right kind of assistance. This is accomplished by selecting the mode which maximises the pairwise difference of confidence gradients between different goals. 
+
+		Write about software architecture work:
+		The software architecture that is used for developing various behaviors for the robotic arm emphasizes modularity between lower level base code and behavior specific code. ROS Moveit! is used for planning related behavior, whereas Kinova API provides direct access to position and velocity control. The base code successfully integrates both. 
+		Furthermore, we also looked into various approaches for generating autonomous robot policies for the arm. Learning from Demonstration apporaches (SEDS) have been successfully used for a small subset of tasks. Currently we are working on developing potential field approaches which will generalize well to different scenes. 
+		Write maybe about potential fields:
+	Study specific:
+
+		1. Look into analytical solutions for confidence formulations. Possibly prove that any confidence that is worth its salt will have some sort of distance formulation (maybe). Identify characteristics that confidence formulation should have to be of any use within this framework - Done. 
+
+		The monstrosity of these analystical solutions are getting out of hand. There are discontinuities in the velocity field which will make the gradients discontinuous. Might still be interesting to compare the analytical and sampling based gradients. 
+
+		2. Think through the experiment and try to come up with hypothesis and why the hypothesis is important. How exactly will we test the hypothesis. EXPERIMENT DESIGN!!!!
+		3. Look into how exactly questionnaires need to be created. Psych, sociology questions. 
+
+	General to lab:
+		1. Head Array Mapping, Sip n' puff mappings - 
+	    	Most likely two sets of mappings. One which is generic for the lab, The other which will involve "assistance upon request" integrated with the control interface - Mahdieh is looking into this. the basic form. I will have to modify it to incorporate the "request" within the interface itself. 
+
+	    2. With Siddarth - look into "current mode notification" system. 
+	    3. Look into ensuring robustness (less false positives) for sip n' puff. Will require some good signal processing chops. 
+
+	    
+	    4. Kinova Driver + API related stuff - Looked into ROS control and how it works. Better - Done..Work on it tomorrow. 
+	 
+	Personal interest: 
+		Topological and Diff Geo descriptions of human motion (reaching, grasping, large scale), and human -robot interaction. Look for papers books related to Subharjit's and Vijay Kumar's works. Topology and diff geo concepts in robot motion planning etc. - Need to be done
+
+
+	Reading Papers - 
+		Nathan's (Almost there with using the info in the paper within the context of potential fields. )
+		Dan' Popa's. 
+
+	Add submodule instructions in WIKI - Done
+
+
+
+	Meeting:
+
+	1. Show potential field
+	2. Show math conf gradient
+	3. Talk CV
+
+	********************************************************************************************************************
+
+	This week:
+
+	Characterising Potential Field. Things to look for in the experiment. 
+
+	Scenario one:
+	 1 goal, 1 obstacle
+	 1 goal, 2 obstacle
+	 1, 3 obstacle. 
+
+
+	Check randmozied distribution map in Matlab to see if it makes sense. 
+
+	Spawn goals outside the base cylinder area, outside obstacle. 
+	So order in which randomization should work. 
+
+	randomize_orientation() -done # this will determine the base cylinder size, altho this might not be any more relevant. 
+	randomize_obstacles() -done # make sure they are not overlapping
+	randomize_goals() -done
+
+	Experiment methods. 
+		Go back to home every single time...Maybe?
+		Continuous experiments - A to B to C to D. 
+
+	What to look for:
+		Success of completion - Based on proximity to goal both in dist and degrees. Also record the actual ending distance, since success depends on our definition of threshold. 
+
+		Time taken - Have a timer running? Is this possible?
+
+		Length of trajectory to compare with straight line distances. 
+
+
+	1. Finish automated testing of potential fields. Write data into text files "after" each run. Have a time out, after which the robot will be reset to home. When it hits timer it will indicate failure. 
+
+	Timeout - done
+	distance calc-  done
+	end condition checking - done (very stringent now)
+
+	Now incorporate automatic continuation of process in a loop. When timed out. Keep going? or reset to home? - done
+	Should we change to kinova home. 
+
+	2. Test Kinova API suggestions - weoird stuff for cartesina from API
+
+
+	3. Start converting pfields into service based stuff, so that when "blending" happens the queires for robot policies can be made into service calls. Same as Seds. Start looking into conf_disamb node. (Assuming that request came in) -GOtta do
+
+
+	4. finish gil's paper revisions. 
+
+
+	Path Length, StraightLinePath, Time Taken, IsSuccess, Target Orientation, End Position, Goal Position
+
+	USACPD0UYW916C
+	
+
+	Finish Passport - Done
+	Do another pfeild run - Done. Pretty decent. 
+	Complete edits for elsevier - Done
+
+	Start designing service call architecture for conf disamb - start with pen and paper. follow SedsModel (not bad). Make sure it suits the conf disamb needs and not just the blending needs. 
+
+	 1SWPN18XK15279
+
+	 USACP061F116
+	
+
+	runs: 
+
+	eval_data_run1.csv - one extreme goal almost screwed it up. the robot took the wron path around the base. (solution instead of skewing the y direction, "add a -y component to shifted it that". skewing will accidently skew the +ve component to more =ve values)
+	maybe add self.isobs flag to stop rotating while within the obstacles. 
+
+	eval_data_run2.csv - slight bugs in code. switching between stage 2 and stage 3 is triggering false positives (maybe the velocity is becoming zero for a short time). When goal is right in front, things can get into crooked positions. 
+	Fighting repulsive forces when the obstacles are in front and the base repulsion and the obs repulsion compete (possible fixed, reduce size of cylinder). Possibly add a "velocity wind" towards the goal when in obstacle ( a bias towards the goal) 0.3 and 0.25 cylinder sizes
+
+	eval_data_run3.csv - 0.3 and 0.25. 0.015 trans threshold. Some spurious results due to bug in code. Transfer between stage 2 and stage 3. Gotta catch that. 
+
+	eval_data_run4.csv - stabilizing stage 2. 0.015 trans threshold. 0.04 rad rot threshold. 
+
+	eval_data_run5.csv - same as before. Now I will pay attention. Printout the run number.
+		Traj 2,5,7,13,24 - got stuck between cylinder and obstacle
+		Traj 8,9,31- very close. Possibly due to stringent end conditions (make the check and the actual velocity different. velocity cane be a scaled up version of distance) 
+		Traj 6,14,15,17 20,23 - over the top swing (maybe relax the switching trans condition. have two different conditions based on what stage they are in. stage 2 less stringent. stage three more stringent)
+		Traj - 19,22,25,26,27,29,30 - (2to 3) over the top swing
+		Traj - 32(thought it was outside the cylinder. therefore tried a stright line. but before that the robot was at the edge of crookedneess)
+
+	eval_data_run6.csv - different trans end conditions for stage 2 and 3. 0.04 rad threshold. Hopefully to improve the switch. Nothing to deal with getting stuck in between obtsacle and cylinder. (if in base, there is no attractor still. so NO pull towards the goal). probably when in obs, stop rotating and only translate. like within table
+		Traj 14,22,25,26,27,35,37,38,45,47 - over the top swing (locate into object position) (play with relative strengths of trans and rot?)
+		Traj [17,33,40], 28, 31 - very close. [slightly crooked (not able to finish translation)]
+		Traj 18 - hard work to recover from crookedness in traj 17. 
+		Traj 20(almost), 39-got stuck between cylinder and obstacle and swing 
+		Traj 21,23,36, /42 - chatter in and out of obsatcle/cylinder. 
+		Traj 24 - combo of over thetop swing and chatter in and out. 
+
+	eval_data_run7.csv - scale up the trans velo to 1.2timesdist. This will probably help in overcoming the over the top swing as the trans will dominate the rot and push it towards the goal further.  Nothing to deal with getting stuck in between obtsacle and cylinder. (if in base, there is no attractor still. so NO pull towards the goal). But if within obs or within table, only translation will happen. Less stringetn rot end condition for stage 1 to 2. similar to less strringent trans for stage 2 to 3. (Maybe increase trans thresh for stage 2 to 3 probably reduce the 2to3 cases, over the top swing especially when target is flat)
+		Traj 2 - a little bit  chatter. 
+		Traj /6,14,17,26 - /stuck between obs and cylinder and the no rot within obs caused it to take weird config pretty fast
+		Traj /8,24 - very close. [/slightly crooked (not able to finish translation)] (can reduce rot threshold maybe)
+		Traj 15,16,19,20,21,25,27,30,31 - (2to 3) over the top swing
+		Traj 18- chatter in and out of obsatcle/cylinder.
+
+	eval_data_run8.csv - increased trans vel to 1.5*dist. increased threshold for trans switch between 2 to 3. separate rot threshold for switch between 1 to 2 and end condition. 
+		Traj 4,5,16 - Over the top swing. Regular
+		Traj 6,11,30 -	Over the top swing. 2 to 3. Target OTP
+		Traj 8,31 (OTP SWING) /24 - very close. /crooked
+		Traj 9,28 - stuck between obtsacle and cylinder
+		Traj 27 - chatter within obs
+
+	eval_data_run9.csv = increase it to 1.6*dist. if within base, the attractors are still on in this case. 
+		Traj /2,9 - very close (/took a long time to convegr)
+		Traj 4,5,6,7,8,10,12- over the top swing
+
+	eval_data_run10.csv - Scaled rot vel by angle. Increased threshold for stage transition. 
+		Traj 25 - crooked 
+	The increase threshold might have had a huge impact in reducing getting stuck?
+
+	eval_data_run11.csv - 3 obstacles. 
+		Traj 2,3,18,20 - In stage 3 and can't reach the end point. because of OTP swing. 
+		Traj /4,23 - very close, /long time to converge. 
+		Maybe some spurious end conditions?? Maybe...
+
+	eval_data_run12.csv - 3 obs, removed zeroing out velocities between 2 and 3. Causes spurios results when final taregt is OTP. 
+		PRetty ok. Some weird crooked zones
+
+	eval_data_run13.csv - Immediate switch from 2 to 3 upon crossing the center line. Maybe increase the scaling of rotation a little bit from 0.25 to 0.27. Maybe make the attractor stronger? Faster movement towards the goal? 
+		Traj 25 - got stuck in between obstacles
+		Traj 36 - OReintation changed fatser while trans was stuck in between obs and base.
+		Traj 42 - Wrong side.
+		Pretty good results. 94.0%. 
+
+	eval_data_run14.csv - Try out all three target orientations. With more weight for door knob
+		Traj 2 - Too much time to converge. 
+		Traj 3,5 - Over the top swing
+
+	eval_data_run15.csv - Increased rotation
+		
+
+	Todays work:
+	1. Get printouts for everything passport: Check the document checklist and see what OTHER stuff needs to be printed. Complete the REST of the form using ball point pen. 
+
+	2. Sofwtare architecture:
+
+	Blending node: Will need this one as blending based on confidence is going to happen in this project as well. Similar to SEDS. The blending node considers all combinations of goals and obstacles and pick the one combination which has the highest confidence. Blending needs to happen in all modes. 
+
+	The disambiguation is mainly going to happen as a result of the interaction of the "joynode" (the one which detects the request) and the node which does the conf disamb (the math for it and determines what the mode should be)
+
+	How to represent the goals and obstacles? Should they be different arrays or should it be the same with a field indicating whether its a goal or obstacle. At any given instant, only one of the objects in the scene will be a goal and the others are obsatcle. For exmaple. If there are 4 objects in the scene. Four possible configs are allowed. 
+	1000, 0100, 0010, 0001. The conf disamb node considers all such possibilities during its computation. 
+	Remember the partial derivative is for EACH goal along EACH control dimension. That is the confdisamb node should have the positions and orientations of ALL objects as they are all possible goals. confdisamb node considers obstacles in an indirect way (through the robot policy)
+
+
+	What do I need: ObjDesc - location and target orientation (as an enum or something?)
+
+	SetObjectsService() - Input =  List of ObjDescs. Output = None (setter service)
+	SetGoalsObs() - Input = number indicating which one of the objects should be treated as goal and the remaining should be obstacles. This will update the self.goal_positions and self.obs_positions before the query. Output = None (Setter service)
+	QueryRobotVelocity() - Input = current robot position. self.eef_position, Output - 6d velocity with respect to world frame
+
+
+	For each configuration (or each "model") have a pfield node running. 
+
+	How to determine the "stage" in which the pfield should be running for each goal-obs configuration? 
+	If separate nodes are used, thne dealing with the different stages of the algorithm might get easier. 
+
+	In such a case. 
+	At launch time indicate the total number of objects. self.num_goals = 1 (always). self.num_obs = n-1
+	SetGoalsAndObsService() - Input = List of ObjDescs, Number indicating which is the goal (the remaining are assumed to be obstacles) - Done
+	QueryRobotVelocity() - Input = current robot position. self.eef_position, Output - 6d velocity with respect to world frame
+
+	Everytime a query comes in, should be treated as a "new beginning". self.istrajstart = True? Think about this hard. 
+
+	3. Prepare for tomorrow class. Read the first few chapters. 
+
+	chatter - self-awareness for chatter
+
+	Things to try out:
+	a. stabilize stage 2. make some eval.  (This can probably help with not making the robot crooked in the middle zone)
+
+	b. Possibly have the attarctors "on" even within the cylinder, so that there is always a "pull towards the goal". Do an evaluation withi this. - make evals. 
+	add velocity wind if needed, probably try out tangential velocity for the cylinder. think of how the new conf formulation should look like.
+	Try velocity wind, tangential movement along the cylinder
+	
+
+	Today:
+	Start with pfields - some improvements. play with thresholds a little bit more. 
+	Work on API iwth Siddarth
+	Read PR and make notes. Entire Bayes Filter. Refer to PGM and ML notes from back in the day for more Bayes Theorem related clarifications. Get Bayes Filter in my gut! Intuition is key! How KNOWDLEGE of one thing affects the KNOWDLEGE of other and how it is propagated via probabilities. Refer back to PGM course (Bayes Theorem ideas are well dealt with). PGMs dealt with DBNs. 
+
+	Friday: 
+
+	1. Try out the remaining options for pfields - tangential field on the base (based of if onL or onR. stronger attractor, which can supersede the over the top swing - Done
+
+	2. Change iswithinbase only repel. Keep same end condition - Done
+
+
+	Coursework:
+
+	1. Read PR. Start Udacity course. Start looking at data for homework - Done
+
+	Common:
+	Start desigining demo - Done
+	Kinova API - Took videos and posted.
+
+	Today:
+
+	Create anothe node for scene instantiation. Should take the number of possible scenes and instantiate the goals and obs in appropriate pfeild node based on namespace. similar to how SEDS worked. having independ tnodes helps in easier switching implemtnation. sikmilar to fakeperception node. 
+
+	instantitaor node takes in ALL the objects and cycles through all the possible scene options. For N objects the number of pfield nodes that will be instantiated will be N. 
+
+	Should I maintain a driver class? 
+	Or should I just be bothered about the blend class?
+
+	In SEDS, the driver uses services to communicate with ds_server. All the seds vels are then combined into a list and send over a service to the blend node to compute max conf seds vel. Then the seds service is called once again using the best conf model. which is then published as a rostopic which the blend node listens to. Slightly convoluted. 
+	Instead, 
+
+	The blend class can "query" all the velocities. Stack them into an array of vels. All vels are needed for argmax conf computation. Once the max is computed, since the node will be maitining a local copy of ALL the vleocities there will ont be a need for another service. Just use the argmaxconfth velocity for blending. Is that a good idea?
+	Create msg and service type to communicate between the bledn node and EACH of the of node. 
+
+
+	Alexander Smits:
+	Manta Ray Swimming:
+
+	Gliders, Buoyancy driven and Propeller based. 
+	Bio inspired AUV (Autonomous underwater vehicle)
+	Physics of Manta Ray Swimming
+	Bio-robotic propulsors:
+
+
+	What should the service call do:
+
+	1. Update position
+	2. ResetFlags()
+	2. Compute stage, update_stage
+	3. Compute the current velocity
+
+	Computing isLtoR and isRtoL every time step, as soon as the robot crosses the middle line, stage 2 will be done. Maybe reduce the rotational velocity. 
+	Or will have to keep tracking of the order in which the services where called. if the previous service call was to the same pfnode, then don't do the isLtoR or RtoL again. Only do it when there was a "switch" in the current model. 
+	Or probably, this issue could be avoided if only one pfnode was used. In which case there won't be separate self.stage variables for each configuration. 
+
+	Maybe evaluate pfield with a stage switch from 2 to 3 as soon as it crosses the middle line. If that works alright then this will be ok. 
+
+	Maybe change response on QueryVel into a Float32MultiArray for sake of consistency instead of Twist - Done
+
+	Blend Node: 
+
+	Possibly do away with the driver class. Therefore the blend node will mainatin a list of all possible attractor velocities. The confidence calculation is done locally without any reliance on services. Then the velocity with max confidence is chosen locally within the node before sending it as control_input. 
+
+	The blend node will also have to maintain a list of objects. this is because in the confidence computation, it will no longer to uh.ur but instead uh.(vector connecting the goal). For that we need access to object location. this can be done using the set_goals_obs script by calling another service which will set the object list in the blendnode. all in one shot. the purpose of the set_goals_obs script should be to set the goal and obs location at ALL required places. Even when hooked up with the perception system. The perception system should talk to this which in turn will update all the required nodes with the updated goal and obs sytstem. 
+
+
+	Things to do today:
+	1. Evaluate pfields with switching from 2 to 3 imediately after it crosses the center line. If it does not work sketch out the alternate way of implementation with one single pfnode
+	2. Read PR
+	3. Go through HW a little more closely. possibly try tweaking the model ? with added noise. 
+	4. Consent forms upload with Siddarth
+	5. Finish blend node and communication between pf node 
+	6. Print review paper. 
+	7. Buy insurance, pay tuition. 
+
+	Blend node will subscribe to /user_vel. It will always query all the p fields velocities and maintain an array of robot vels. perform confidence computation. and then pick the correct vel. add it with the user vel. and then publish the /control_input. 
+
+
+	have eef_pos and eef_quat. use tf. get the pose. make it a queryvel. send it to each one of the pf nodes. Each will return a velocity. Store it into an array of velocities. 
+
+	Setup a subscriber to /user_vel.
+	Once you have all of this. Perform the confidence computation. 
+
+	Think about timing: and how exactly the synchronization of service calls, conf computation and final publishing of control input should happen. 
+
+
+	How exactly to do the confiedence computation:
+		1. the alignment of the translation part of u_h with the vector connecting eef_position and goal position (only if the translational part is non-zero)- Directedness towards goal_position
+		2. The alignment of the rotation part of the u_h with the angular velocity that will take the robot from current eef_quat to goal_quat (only if the rotational part is non=zero)- Directedness towards goal position
+		3. Translation distance of eef position from the goal position - Nearness to the goal position
+		4. Difference quaternion between the current quat and the target quaternion - NEarness to the goal orientation
+
+	None of these components explicitly depend on the robot policy. u_r is not being featured. Is that a good or bad thing? How can u_r be used?
+		5. Alignment between user and robot policy. Robot policy encode the presence of obstacle and robot constraints etc. This alignment will reveal whether the users are also aware of such envirnomental features. 
+
+	Confidence is to be computed ONLY when the user input is non-zero. Similar to SEDS blend model. 
+	Also test pfield with all THREE target orientation. Might be needed for the demo that we thought of. 
+
+	The angular velocity that is part of /user_vel is wrt the world frame. Given current quat and taregt quat I can compute the difference quat and then convert it into a angular vel vector and then dot product it with the u_h angular velocity vector. Addresses no:2. 
+
+
+	Today:
+
+
+	Health plan - Done
+
+	Start with running evals for 3rd orientation - See if there are issues that arise due to the fact the final orientation is platepicking one - Done. Not too bad. Could be better. Play around with rotations speeds. 
+
+	Test blending code in simulation to see if the pipeline is working alright - Done. Not the greatest performance with blending. 
+	Possibly switch to velocity controllers from blend node?
+
+
+	Test basic stuff in hardware? - Open my account in new machine. Pull the code base. 
+	Finish up homework and submit it - Done
+	Maybe start studying other online classes - CV and PGM?
+	Take time to read PR, the book. 
+	Look into IRB and start thinking about experiment and why am I doing it. Hyposthesis. Experiment protocol. Data to be collected. Possible analysis. 
+
+	Today:
+
+	1. Run it on the machine: ***- Done. Serious tuning of velocities required. Maybe add a smoother. 
+		Pull mico_base_pfields, modify the code to run once. 
+		Pull mico_conf_disamb and try out blend node as well. 
+		a. might have to start writing the demo code?two phase demo. 
+		capability for the system to dynamically change the number of obstacles will be useful to shape the trajectories.?
+	2. Read PR, start implementing the HW. Start writeup in latex. Plan out figures, equations etc. ***
+	3. Meeting with Mahdieh and Siddarth regarding interface - ** - Done
+	4. Test blending node more. Try out if skipping stage 1 is a good idea for blending? improve confidence measure one at a time - ***/**
+	5. Start implementing the conf disamb node. When the conf disamb happens the user vel is 0. Therefore changing the pfield vel is not going to affect anything. The services will be overloaded - *
+	6.Reading group paper printout- *
+	7. Paper Review - **
+	8. Online classes - **
+	9. IRB / Experiment design - **/***
+
+
+
+	t1     t2  t3 t4  t5t6t7t8t9
+	a      b   c  d   e f g h i   
+	  o o  o   o o o     o   o 
+	  a1a2 a3  a4a5a6    a7  a8
+
+	a a ab b c cdd de f ggh ii
+	  o o  o   o o o     o   o
+	t1a1a2t2 
+
+
+
+	t1         t2     t3  t4    t6      t7  t8
+	a          b       c   d     e       f   g  
+	    o   o    o   o        o     o  o        o
+	    	o        o                 o        o
+	    			 o
+        a1  a2  a3  a4       a5    a6 a7       a8
+
+
+ 	a   a   a  b b   b c   d  d  e  e  e f   g  g
+	    o   o    o   o        o     o  o        o
+	    	o        o                 o        o
+	    			 o
+	t1  a1  a2 t2a3  a4t3  t4 a5 t6 a6 a7t7  t8a8
+
+	reconsturct control data by adding more points. 
+
+	today:
+
+	1. Primarily work on homework - Maybe start working document(Till early afternoon)
+
+
+	2. Test out pfield on hardware. consider filtering the output. reduce the repulsive force. Test out blending node as well. Need to start designing the demo (post lunch till early evening)
+	3. Think about experiment design (from 4-6pm or so). 
+
+
+
+	Things to run:
+	2000 particles - Slightly Sparse. Full. 
+	1500 - Very sparse. minor changes in noise in measurments. 
+
+	Meeting:
+
+	1. Implemented it on hardware. works. tuned well. discarding the stage one. not necessary it seems like. Blending works. 2. Need to work on building the confidence metric. simple one right. Blending should also happen in rotation
+
+	2. Courses for future maybe? - Want to do a topology class + maybe algorithms? 
+	3. Will work on IRB this week. 
+	4. Paper review. How to go about it?
+
+	4-5pm - Oct 10. Ability Lab. 
+
+	ME rules. TGS requirements and ME requirements
+
+
+	1.set obs and goals for single stage task but multiple goals
+	2. set obs and goals for multi stage task but single goal in each stage. 
+
+	Check into whats going with "wrong side"
+
+	For multistage. Still have n number of pfields. but each pfield will have only one attractor corresponding to the goal for the nth stage. 
+
+	instead of self.compute_confidence in the blending node, it will be transformed into a function which will update the current goal based on what stage is being executed. 
+	Key components: checking for  whether a stage has been complted or not. For the demo task, just like in mico_customization, maybe once the robot reaches a zone with the corresponding goal, user can be in control. Then check for whether the fingers have been closed. Once it is closed activate the second stage. The goal being the way point. A check for whether a stage has been completed can also be done by just looking at the robot velocity and if the velocties are zero. Upon completing stage 2, immediately switch to stage 3. 
+
+
+	Things to do:
+
+	Set up new workspace. pull mico_base as submodule. add mico_pfields. add mico_blend (modified). 
+	new setup_obs script. To spawn 3 different pfields with 3 different end points - Done
+
+	Implement blend_node in which the compute_confidence function has been replaced. Incorporate, interface callback. Make sure the serial bus is connected - Done
+
+	Today:
+	1. Read about search, start homework. Setup the data structures. Think about it to make sure the right decisions are made.
+
+	2. Start implementing confidence disamb. This means that the "confidence" formulation needs to be thought about. Service call in blendnode? or maybe a local version. What do we need? for confidence. a)Current position and projected position b)Robot velocity and projected robot velocity 3) User velocity. (all of this is available in blend node or can be computed by extrapoltion in the blend node)
+
+	Notes: 
+	Control modes can follow a heirarchical structure. Should the conf disamb algorithm work at the lowest granularity level? For example, according to Mahdieh the sip n'puff might have a mapping in which the mode organized as follows:
+	Translation:
+		F/B
+		L/R
+		U/D
+	Rotation:
+		RF/RB
+		PF/PB
+		YF/YB
+	Gripper:
+		Open/Close
+
+	The algorithm should be able to pick the lowest granularity level control mode. That is in the above mentioned case the algorithm should NOT try to pick between Translation/Rotation/GRipper but instead pick betwee F/B, L/R, U/D, RF/RB..., Open/Close. (This is seven mode in total). However at each level, there has to be one "channel" open for requesting assistance. Or should it be an verbal assistance request. In order to save a channel from completely dedicated to requesting assistance. Or is verbal not always possible? Have a dedicated channel for assistance request can further increase the number of control modes, making it harder for the user to remember all the mappings and execute the motion of the arm. 
+
+	There has to be a mapping between how control modes are represented in the algorithm and how the control modes are represented in the teleop node. 
+		TEL   	Algo
+	1
+		1A    	1
+		1B		2
+		1C		3
+	2
+		2A		4
+		2B		5
+		2C		6
+	3
+		3A		7
+
+	For each control dimension (or for each positive control dimension and positive control dimension?) there is a confidence disambuguation function which maps to a real number. This is the sum of the pairwise confidence gradients for each goal within this control dimension. THe main focus of the formula is this euqation. 6 such sums (one for each control dimension)  will be computed. A score for each control mode will be calculated by adding all the scores for all the control dimensions within a mode. 
+
+	What the sum of the pairwise differences computes is the "GAIN in spread upon moving along a dimension (either positive or negative)".
+
+
+	Pratcical notes. What is the best to communicate what the mappings are to the conf-disamb_algo code? From launch using a tag? The "teleop" node launched from the launch file will be different depending on the interface. A tag can be used so that the control mode array is initialized properly in the conf_disamb_algo node. The control dimensions in this case is always going to be 6. Use a string to denote the control interface type and in the conf_disamb node, use switch case to initialize the control mode array properly. The control interface tag should match the joynode being used. 
+
+	This system is going to be used for scenarios where there are multiple goals at a time and multiple confidences. 
+
+	If the confidences are very close by then probably picking the highest confidence is not necessarily the best. Maybe there should be a minimum spread in the confidence before which the system should start helping out?
+	For example if there are 3 goals are 0.61, 0.6 and 0.59, argmax will pick the first one, however the others are very close. However if suppose upon moving in a particular dimension
+
+	Maybe for headarray
+
+	F/B
+	L/R
+	U/D
+	RF/RB
+	PF/PB
+	YF/YB
+	GRIPPER
+
+	For the confidence GRIPPER dimension will not be considered.
+
+	Start the conf node:
+		Finalize the equation properly. Also think of multistep evaluation. Setit up so that the number of steps is a parameters. More steps means the number of service calls is higher. Should the pfield node have a separate service for conf query pruposes. Or dirently manipulate the self.position vairable. if so locks will be needed. because blend node will also be trying to do it while the conf node is trying to compute. 
+	Work on IRB. Which means think about the experiment rigourously, think of tasks. Think of how pfields can be used in the tasks. 
+
+	Implementation notes for conf_disamb_node:
+		Needs confidence values for different (projected) ee positions for different goals to compute gradients properly. 
+
+		Conf_dismab node can 
+			1. talk to blend node and ask for the ee position
+			2. or use tf directly to get the ee position. 
+		Advantage of 1. is that it can also set a flag in the blend node, which will stop the blend node from talking to pfields and update the "current position" variable in the pf nodes while the conf_disamb computatoin is performed. 
+
+		The chain of events:
+
+			Joynode detects the assistance request -> calls service offered by conf_disamb node (no input, only response(contianing the best mode)) -> conf_dismab will in turn temporarily stop the actual computation by setting flag in blend_node (service) -> Will call another service in blend node which returns all the necessary confidence values as a list to the conf_disamb node. (this is because the current position and the interaction with pf node is easily facilitated in the blend node) -> the confidence values sampled are then used to compute the best mode -> The flag is reset to true, denoting that the computation is done. 
+
+		Conf_dismab_node to blend node through 1. Make a new service type for this communication. Takes in nothing, returns a list of confidence values. 
+		Maybe also have another service type to set the flag that conf computation is happening. 
+
+		For every dimension, increase the position along that dimension both in positive and negative direction by a little bit and also set u_h to be a unit vector in those directions. For each new position, query the pfield vel. 
+
+	
+		confidence graidents for rotation space. 
+
+		what happens to the confidence for each goal when the user decides to move along the wx,wy,wz axis of the body frame a little. 
+
+		currently the robot ee orientation is some quaternion with respect to the world frame. 
+		a body frame rot vel comes in. this needs to transformed into world frame vel using Rsb*wb = ws. This ws should be converetd into a quaternion that needs to be "added" to the current quaternion to produce the new quaternion. 
+		This new quaternion can be used 
+
+
+
+		Communication between joy_node and conf_disamb node. Way to trigger the service call in conf_disamb. 
+
+		IRB related stuff: Need a clear idea for the experiment:
+
+		What is this?
+		A mode switch assistance system based on confidence gradients. Activated upon user request. 
+
+		Hyposthesis. Experiment protocol. Data to be collected. Possible analysis. 
+
+		Hypothesis: Hypothesis is that this mode switch assistance system is going to be used more number of times when the control interfaces become more limited and also when the complexity of the tasks increase. 
+
+		How to characterize the limitation of a control interface? Possibly by looking at the number of control dimensions per mode...
+
+		How to characterize the complexity of tasks?
+		Multiple goals in the same scene (increase the number of goals) - this will put more stress on the system. 
+		Multiple segments in the task - but there is only one goal per segment. 
+		Increasing complexity by more complicated target orientation. 
+		Multisegment, but with multiple goals in stage one
+		Randomizing start positions, will change the complexity of the tasks. 
+
+
+		Possible control interface -  joystick3, joystick2, headarray, sipnpuff (maybe?)
+
+		3 possible scenarios: (confidence based blending always present). Is that the right thing to do?
+			a. No mode switch assistance (with only blending) - possible baseline. 
+			b. Mode switch assistance in the beginning and therefore belnding also from the beginning
+			c. Mode switch upon request (this does not guarantee that there will always be a request). There can even be multiple requests. 
+			d. Should we have pure teleop as a baseline for all of it? Or should the base line be blending based paradigm?
+			e. Should there be a paradigm in which the blending kicks in only when the assistance is requested. 
+
+
+		How many tasks?  possibly 3? 
+		How many trials for each task per scenario? 3-5?
+
+		Is the optimal mode, always the same for a particular task? or does it depend on the current state of the robot. I believe the latter is what is going to be true. 
+
+		Data collected: Time taken, number of user mode switches, number of times the assistance was requested
+		Subjective data: (Look into HRI literature to see how questionnaires are made)
+			1. Do you like the presence of an assistance upon request system for mode switch assistance. 
+			2. Did the system swicth you to modes that allowed to express your intent clearly?
+			3. Was the system able to identify your intent correctly?
+			4. Was the system able to provide the right kind of assistance.
+			5. Which one of the schemes do you prefer the most?
+
+
+		3. Subjective evaluation:
+
+			1. Which interface was the hardest? 
+			2. For which interface was the assistance paradigm the most useful?
+			3. Was the mode picked by the system appropriate enough to express your intent? 
+			4. How often did you want to be in a mode different from that picked by the system?
+			5. Which scenario was the most user friendly?
+
+
+		There should also be a minimum spread between the confidences for the blending to kick. Disambiguation is about maximising the "SPREAD" between the confidences. 
+
+		Gotta establish whether it was not just a CHANGE in spread but also a positive CHANGE in the spread. Or else it is useless. This will have to do with whether it should be a euclidean pdist or not. 
+
+		Work for the day:
+		1. Claroify the homework - Done 
+		2. Work on review tonight - try finishing it. 
+		3. Start sketching out the inverse controller. Maybe modify the algorithm, make it more like A*
+		4. during the day - clean up the conf formulation
+
+
+
+
+
+		O1: In this study, we will evaluate user performance on three different control interfaces and two different tasks (with randomized home positions). There will be three different conditions under which the data will be collected. 
+			a. No mode swicth assistance. (Should this be pure teleop). Or should this be plain blending?
+			b. Mode switch assistance at the beginning. Starts off with "best_mode" according to the algorithm (with blending)?
+			c. Mode switch assistance upon request. 
+
+		If blending is not present in a. Then when we collect data in b and c are we evaluating the mode switch assistance or blending. By having blending as a common factor we are eliminating the effect of blending. 
+
+		
+
+
+		How will complexity of tasks change depending on the start position? Maybe charaterize complexity by looking at the difference between initial and final pose. 
+
+
+
+		IRB TEXT:
+
+		O1: To investigate how task complexity affects the need for mode switch assistance? 
+			Maybe two different task scenarios:
+				For each scenario change the starting position to one of predefined 3-4 random starting positions. 
+				Task complexity for each trial can be quantified by looking at the different between initial and final pose. 
+
+		
+		Hypothesis
+		Mode switching assistance will be more effective in more complex tasks. 
+
+		O2: To invesitgate how limitations in control interfaces will affect the need for mode switch assistance. 
+		Have 2 interfaces - maybe joystick2 and headarray? 
+
+
+		O3: Utility of the paradigm in the first place. 
+		O4: Pattern in assistance request in the on the demand mode. 
+
+
+		G-Power analysis - online tool - 
+
+
+			For each interface repeat
+		
+		Hypothesis:
+		Mode switching assistance will be more useful for more limited interfaces
+
+
+
+
+
+
+		Notes:
+		How should the user be allowed to cancel the assistance? (The robot pick mode 2. User overrides and chooses mode 6. Should the blending be still on?)
+		If blending is not present at all times as a baseline, then we will analysisng the combined effect of mode switch assistance AND blending. We don't want that. 
+
+		Notes for pfield improvement. 
+
+		When y is positive, provide a pure translation in negative y direction. Push it to the front. 
+		Check for smaller rotation direction. Issue of quaternion flips for certain edge orientation. The rotation vel should always be taking the robot in the smallest route. Fixes similar to what we had SEDS might come handy. 
+
+
+
+
+		Review due tomorrow - on tuesday
+		Work on homework - Break down paths into pieces and interpolate. 
+
+
+		Tomorrow:
+
+		1. Work on review - done
+		2. Finish full confidence formulation, including rotations. Test in simple blending - almost done. 
+		3. Finish interface design thoughts - almost done
+
+
+		Topology Notes:
+
+		Metric Spaces -> Open Sets -> Topological Space  -> Manifold (homeomorphism and diffeomorphism) -> Differentiable Manifold -> Riemannian manifold
+
+		Study of topological spaces and invariants is Algebraic Topology
+		Study of manifolds and the differential structure is Differential Geometry
+
+		Understanding, diffeomorphisms and homeomorphisms. homology and cohomology
+		http://web.cse.ohio-state.edu/~tamaldey/course/CTDA/CTDA.html
+
+		Ideas in TOpological Data Analysis possibly applied to human robot interaction data. 
+		Topology of human action. Topology of robot actions. Can there be a topological measure as to when the robot policy is going to be useful for the human. Robot policy need NOT be exactly the same as that of human policy. But is there some sort of "distance measure" between robot policy and human policy which will be minimized when the assistance is the best. Ergodicity. 
+
+
+
+		Things to do:
+		Print Boarding pass.
+
+
+		1. Email Mason -done
+		2. Email Mahdieh and ask her to put together a list of stuff that we thought about for the mode switching interface - done
+
+		3. Integrate "mode switch assistance button" in the joystcik interface node. Make a local package for teleop and another launch file which will trigger the velocity controllers and start the teleop node with the assistance. Integrate the conf_mode service in the joystick node. Complete the disambiguation to compute best mode and not just best dimension. This will require mappinsg between interfaces and modes etc. key:dict kind of structures. 
+
+		4. Understand and clarify the math once again properly. Quantify the gain inc onfidence properly. plot and publish. Do we OURSELVES think this is going to be useful. Is the confidence formulation doing alright? Randomize the goal positions and see if this is still making sense. 
+
+		5. forward projected rotated user_vel needs to be converted into proper frame (should I be using R from the current oreintation or the projected orientation). 
+
+		6. possibly have blending not just a function of confidence, but also "how much" does the user needs help at this point. Can ergodic measures come into play here. Running histogram kind of approach. If we see that the robot is not moving a lot in a time frame, this is quite possibly because the person is finding it hard to maneuaver it outside of the stuck zone. In which case assistance got to be increased. 
+
+		Change joy2axis.py in mico_base to include orientation reference change -Done 
+
+
+		Things to clarify during meeting. 
+
+		What should u_h be for the current confidence? use two diferent u_hs for two different directions. 
+
+
+
+		Today:
+		Work on homework problem- look at the data. 
+		Consolidate the problem statement a little stronger. Look into related lit. What should the input vector look like? How is this going to improve the performance?
+		
+		Reading literature on Nueral nets for noise - Think hard about the problem statement. 
+		Chapter 18 - AI book
+
+		Locally weighted regression - for class. 
+
+		Revise the conf code. to include 4 columns - Done
+		Actually implement the change in mode, ie set the self.mode variable in the joystick nodes to the answer returned from the conf calculation. 
+
+		Add compute best mode assistance to sip n puff - To be done. But with the current mapping may not work. 
+		Come with evaluation scenarios
+			Use simpler confidence formulations so that the effect of each component of the confidence can be studied separately. Start with maybe just uh.ur in trans of just the distance based formulation. Incorporate the bounding region for distance automatically. adopt the same distance conf from the matlab script. 
+
+
+		
+
+
+Things to do:
+
+Reqrite the code to simplify the conf - Done
+Read about GPS and look at the code a little bit and start thinking bout what to be done with out system - Half done. 
+Start to implement neural nets. And look at how to organize the taining data. Start doing it tonight
+
+During meeting:
+
+Discuss initial simulation experiments
+	Use simple confidence. Come up with scenarios for clear answers. 
+	Assisgn the result to an actual mode. Come with mappins between 0-5 and actual modes numbers. 
+Discuss handbook
+Discuss Neural Nets. What algorithm to look at? Maybe look at the syllabus and see what will be taught. 
+
+
+Questions to ask:
+
+How to deal with circular data?
+Should all dimensions be normalized. Even on euclidean? 
+Should there be different nets for different components of outputs?
+
+
+Work for today:
+
+Deal with simple confidences. Compare different situations and tweak the algorithm to make more sense. 
+Catch up with class. 
+Write up justification for NUIN course. 
+
+http://matheducators.stackexchange.com/questions/1760/computational-topology-for-engineers
+
+I am Deepak E. Gopinath (Id: 2909041) currently a Phd student in the Mechanical Engineering department and I work with Dr. Brenna Argall in the Assistive and Rehab Robotics Lab at RIC. 
+I am writing to you because I was trying to register for NUIN 480 - Neural Control of Movement for Winter 2017 and the system gave me an error message saying that it was reserved for only NUIN students.
+
+My current research is in developing assistive paradigms for robotic manipulation and in generating human-like reaching movements for the robotic arm so that the assistance is more intuitive and natural for the user. 
+I believe that the content of the course will be of immense help for my research and I am very interested in registering for this course. I was wondering if it will be possible for you to give me a permission number for the same. 
+
+Please do let me know. 
+Thank you very much in advance. 
+Yours sincerely
+Deepak
+
+  
+
+
+NUIN 480 brings in professors from various departments (BME, Neuroscience, ME) for lectures and covers a wide range of topics ranging from Brain Machine Interfaces , Cortical representation of arm movements (which will help in the design and understanding of what constitutes natural and intuitive reaching motion for a robotic arm and control of the same) and Sensory acquisition via movement. Having a solid understanding of the neural underpinnings of human motion will in turn help us in designing robust and intuitive robot behavior for assistive purposes. 
+
+
+
+
+
+
+
+Work for today:
+
+try out u_h.ur
+tryout u_h.ur_trans +uh_ur_rot
+Maybe distance should be taken out of the picture or it should be activated only when it isin a zone.
+
+
+Today:
+
+1. Report about registration
+2. Conf formulations
+3. NN's Hopfield Nets. 
+
+
+Things to do:
+
+Try out more confidence metrics and different configurations. 
+Think of tasks and try it on hardware directly. Using 1d mmapping. 
+
+
+Fix potential field issues. 
+
+
+Start thinking about presentation material. Geometry of flow in riemman space. 
+
+
+Incorporate headarray into the system.
+Create script for randomizing the initial mode. (maybe from dynamic reconfigure)
+Create script for randomizing initial home position (Should this be from a set of initial configurations that can be loaded into the gui interface and directly navigated to by the planner)
+
+
+
+ AAAI notes:
+
+ Yannis Demeris - HRI - LfD
+ IFAC- 2016 - DEfinitions of shared autonomy
+ Eric Demester
+
+ Katarina Muellin, Andy Schwartz
+ Gransche - Shared autonomy
+ Tactile exploration focused RL. Vernocia Sanchez 
+
+
+ Meeting notes:
+CPS:
+	Koopman stuff:
+
+
+
+
+Conference:
+
+RSS 2017. Jan 30th
+Collect data Before 24th of. 
+ 1. Forward projected conf disamb. 
+ 2. Conf formulation with distance. not the greatest. Velocity alignment seem to capture the user intent the best. 
+ 3. Task formulations. Should this be simple reaching tasks. Or more ADL based? NEed to have multiple goals, because goal dsiambiguation is the idea anyway. 
+ 4. How to randomize home positions. Pick from a few different options? Or completely ranfomize?
+ 5. How to randomize the initial mode.  Pick from a few different optoins? or completely randomize?
+
+6. Ask about metrics for regression for neural nets?
+
+
+
+ Different positions is always going to happen: Can't have objects on top of each other!
+
+ Same orientation, same plane, but different positions (should only give first 3 dimensions as answers)
+ Same orientation, different plane, different positions
+ Different orientation, same plane, different positions
+ Different orientation, different planes, different positions
+
+ By 14th have the experiment system in place. Finalize on simple tasks. Start writing the math section. 
+ By 21st have data collected from lab members.
+ Vacation 24-31. Continue working on paper. 
+ 
+ Come back from vacation. Do analysis of the data. 1-10th more data to be collected. From SCI? 
+ Start writing analysis and full paper by 17th. Final minus 2 - 20th. Fiunal minus 1 - 25. Final - 29th
+
+ 
+ Generate results in simulations. Plots showing the confidences vary in different dimensions and how the algorithm picked the "right" dimension. 
+ For the conference only preliminary data. 
+ To do:
+
+ Incorporate headarray. 
+
+ Simulation results - 
+
+
+ Thigns to do:
+
+ Set up different object/ scene  configurations - Set_obs_pos - 
+ Incorporate head array. Order mode switch interface. 
+
+ Incorporate scripts to randmize home positions and starting modes. Copute the number of permutations that this will result. 
+ For starting modes a service call trigerred from dynamic reconfigure might be neat. This has to take into account the type of interface being used.  Add this probably in blend node?
+
+ For starting home positions drop down menu will work the best. The controllers can be swithed on the fly so system shut down will not be necessary - Done. Simple script with argument referring to a particula rhome position. 
+
+ Improve confidence formulation to include delta of distance and not just absolute distance. 
+
+
+ Write scripts to capture how the confidence varies. And see if the algorithm indeed picks the correct mode? How can this be tested?
+ Determine what data needs to be recorded. And make sure everything is properly captured. 
+
+ 
+ Be in a mode. Starting operating. Collect confidence profiles (disambiguation)  for different runs. Average it. See if the average is highest for the mode predicted by the algorithm. If so, then the algorithm is able to predict the right mode to be in. 
+
+
+ Read upon topology in flow. Prepare for next week presentation. 
+
+TODO today:
+
+1. Set up different object/scene configurations - Scene 1 done. 
+2. Tune potential fields - Wrong side, Base repulsion - Kind of working. Maybe some neat hack can be done. Try pushing forward way before. Maybe add a low pass to the potential field output to smooth it out. 
+
+
+3. Try out different configurations and see if conf disamb is making sense? If not, identify what is causing the issues and see if there can be an algorithmic fix which will work in a wide range of scenarios. Try this possibly after coming up with a set of tasks. 
+
+4. Think of metrics that will tell us the initial "distance" in terms of modes, actual task difficulty etc. That is for some tasks it might be easier to start in a particular mode, or a particular configuration. This is similar to what siddarth is trying to do in terms of defining task difficulaty in terms of metrics. Maybe such metrics in the mode space? 
+
+5. Read more about flow. See if there are example available which demonstartes distortion of flow vectors in the presence of an object and if there is a diff geo/topological explanbations for the same. 
+
+6. Set different starting modes - Done. 
+possible ways to evaluate the algorithm and test the mathematical soundness:
+
+1. For modes in which multiple dimensions can be operated simultanerously, gotta prove that the gradient is the direction in which the change is going to be maximum. Introduce ideas of directional derivative. 
+2. Show that a discount factor concept will help lookng farther ahead and thereby disregard immediate lack of benefit. consider same scenarios where local change in one dimension will reult in low conf disamb. whereas if we continue to keep going the conf disamb grows so maybe it is better to stay in that place. 
+
+3. Play around with discount fatcor and number of steps. THis is affecting the mode big time. 
+4. Try to add a distance measure. 
+
+
+TASK LIST:
+1. 3 bowls, over the top grasp
+
+2. Cup, plate, bowl (Different plane), 
+
+
+When to help (Random digression)
+
+Ergodic metrics? Timme evolving histogram. Indicators that the human is indeed getting stuck in certain regions of the workspace. Step in and help when the manipulability of the manipulator is reduced. GRadient in manipulability space. Move towards regions of high manipulability.
+
+
+
+Meeting notes:
+
+1. Random home position script added (Pre defined n home positions). Run a node with appropriate flag to move the robot to the specified home position
+2. Random initial mode functionality added - Dynamic reconfigure and service calls. All the different interfaces will be using the same service paradigm
+3. Different tasks. Task 1 approximated. Playing around with the delta_pos, discount factor and number of steps to determine what is useful.
+4. To start simple. Use Khansari's obstacle avoidance (modulation of a non-autonomous dynamical system using local modulation matrix) on top of potential fields as a start???
+5. How detailed should the second round review should be?
+6. Will 499 have a separate meeting times. 
+
+Add delta distance function to the confident? Might improve the mode prediction.
+Protyping in matlab happening. Trying to determine the exact form this delta dist to the confidence.
+
+
+Things to concretely do:
+
+1. DEcide on home positions and code it up. Ensure planning to these home positions is safe - done
+2. Implemene initial mode service in all the relevant control interface files. 
+3. Incorporate head array and think of which mapping needs to be used - Work for tuesday...
+4. Thing of exact experiment protocol. How to ensure (or should I even bother) that people request such an assistance in the first place. 
+5. Add delta distance component to confidencce. Finish prototyping that - Almost done. Maybe playing with discount factor and step size alone would do the job -  Not sure if this is to be added?
+
+
+Work on presentation for Friday:
+
+Talk about what I am trying to do:
+
+1. Use SEDs example. Initial steps. 
+2. How reimanian and diff geo concepts have been used in GR and FD and possible inspiration from that?
+
+
+Wednesday:
+Work with Mahdieh - add head array
+Code up different scenes - Started  and continue to iterate on algorithm
+Start working on IRB, and download paper template and start sketching. 
+Try out quiver with pfield and local modulation - started looking into it. 
+
+
+One of the problems with the algorithm is that the algo, in many cases the gain along a particualr dimension is dominated a parituclar goal or two. That is, it cna be that by moving in a parituclar dimension, the confidence of a particualr goal shoots up whereas everything else stays down thereby increasing the overall confidence dismabiguation. And if the human indeed wants to go that goal then everything is fine and dandy. However the negative case, that is the one in which the user does not want to go that goal, then fighting ensues. Does this mean that some notion of probability is going to be needed? 
+
+
+
+
+
+Presentation notes:
+
+1. SEDS based obstacle avoidance
+2. DMP ideas. 
+3. dynamic potential field. 
+4. recast the problem in riemannian space in someway. hydrodynamics and GR inspired. 
+
+Work on identifying the problems with the algorithm. Identify cases in which it fails and why? See if a modification can be made that will be general enough to capture such issues. Is it a matter of changing the confidence formulation itself? Or identify whether such problems are going to persist even if the confidence formulation is different. 
+
+Added four scenes. 
+
+Starting is a problem. May be try out multiple steps. Delta distance is neat in some cases. But it might skew things uncessary 
+
+Start working on the writing tonight and tomorrow morning. 
+
+Outline:
+
+Introduction
+Related work
+Mathematical Formulation
+Experimental Design
+Evaluation: Simulation, Human Study
+Discussion and Conclusion. 
+
+
+Sunday: Finish Review stuff, Work on more writing of paper and IRB
+
+
+Work on incorporating PF into the ObsMATLAB module by changing the DS. 
+
+1. Finish incorporating the button. Remap rpy properly - Done 
+so it makes sense for me.  incorporate in mico_base. Maybe even try siddarths interfaces for request assistance 
+2. Start collecting related work -  done
+	Mode switching related. human robot cooperation. Syneregy in human robot collaboration. 
+
+	Some on mode switching. Some mutual asisstance, synergy. 
+
+3. Finalize algorithm by Tuesday night on Wednesday. In writing so that its ready for the meeting - Not done in writing. 
+
+
+TODO TUesday:
+
+Test head array in one hour - done
+come in morning. Start writing down the algo - not bad.. The current formulation works for the most part. What brenna suggested in terms of looking at the different between confidence is not directly applicable, because the two points points on the x axis are actually the positive and negative projection. 
+
+Work on modifying the algorithm in simulation. Test out all four scene once more. Identify poroblem areas. Try to see if there are common isseus in all the scenes. If so, how can that be globally addressed in the algorithm - Tested this out in simulation. 
+
+Problem areas are with three different rotations and three different positions. Confidence drops to 0 due to zero rotational pfield vel. then something else will become the preferred target. ANd then oscillations happen. 
+
+
+*******************************************************************************************
+THINGS TO DO - WEDNESDAY
+
+In simulation:
+
+1. Maybe try out conf formulation in which the uh.(vector connecting curr to goal). THe user might use the joystick as some sort of direction pointer mechanism. In which case alignment with ur is secondary. 
+
+Can you prove that for an interface in which each mode can at max operate in n dimensions can only disambiguate between n objects at max? How exactly is disambiguation happening? Is it by actual motion along the dimension? Generalized coordinates for the goal positions. Degree of freedom of goal positions. 
+
+Improving potential fields: Sort of priority to get better peformance of the entire system - Almost done. better repellers. 
+
+Is there someway to smooth the pfield velocity?
+DEal with repellers in a smoother way? Is it worth while to attempt dynamic potential fields at this stage. 
+Dealing with wrong side and more smooth repulsion from base. More a matter of tuning the parameters. 
+Equivalent quaternion. Avoiding rotation in wrong direction...Identifing the shortest rotation path. 
+
+
+
+Three things related to algorithm:
+
+1. What should be the confidence formualtion?
+	Possible extensions include looking at the distance gains upon moving a dimension and somehow incorporating that into te confidence formulation. 
+2. What should be the computation of Dkj look like?
+
+	Is it worthwhile to keep track of the last non-zero confidence list. This will give us an idea of what the user was doing just before he/she requested assistance. And then the algorithm can compute the "gain" from that point. But keeping track of the last non-zero confidence is going to be hard. The MAF on the joystcik message causes a smooth decay of input signal to zero. 
+
+	How exactly to deal with the projected confidence lists. spread of projected+ + spread of projected- or spread of projected+ - spread of projected-. 
+
+	Maybe by just compting the spread the inidivudla characteristics are subsumed. What else are important characteristic. 
+		a. That the confidences themseleves are spread apart properly. so that the major chunk of "spread" does not just come from two different goals.
+		b. That the confidences themselves should be fairly high ? Maybe? 
+
+	Suppose tehre are 3 objects and we are looking at one step look ahead. 
+	1,2,3
+	Only one of the three objects can be highest confidences in either + or - directions. However if we increase the number of steps MAYBE, just MAYBE, a thrid candidate and become on top of the list, These will usually happening on the edge of the task spaces. Otherwise the confidence changes are fairly smooth and this kind of sudden change in order of confidences is not usually seen.  
+
+3. What should the arbitration function look like?  Different arbitration functions for translation and rotation? 
+
+
+Submit:
+
+Try out on real hardware. with real objects. that way the "repulsion startegies of the human" will be clear. Then uh.ur or uh.vector will make more sense.  different scenes. How does the potential field deal with repulsions when going to a goal.
+
+Reach every goal from every home positions. As if we ar repeating trials - Done. Not bad. Play around with the p field values a little bit more maybe to make it smoother. 
+
+
+
+WHat are we interested. 
+
+1. The effectiveness of the algorithm in reducing the number of mode switches. Hypothesis is that for more limited interfaces the reduction in the number of mode switches will be higher thereby reducing effort. 
+
+2. Hypothesis:
+
+
+		O1: To investigate how task complexity affects the need for mode switch assistance? 
+			Maybe two different task scenarios:
+				For each scenario change the starting position to one of predefined 3-4 random starting positions. 
+				Task complexity for each trial can be quantified by looking at the different between initial and final pose. 
+
+		
+		Hypothesis
+		Mode switching assistance will be more effective in more complex tasks. 
+
+		O2: To invesitgate how limitations in control interfaces will affect the need for mode switch assistance. 
+		Have 2 interfaces - maybe joystick2 and headarray? 
+
+
+		O3: Utility of the paradigm in the first place. 
+		O4: Pattern in assistance request in the on the demand mode. 
+
+
+		G-Power analysis - online tool - 
+
+
+			For each interface repeat
+		
+		Hypothesis:
+		Mode switching assistance will be more useful for more limited interfaces
+
+
+Other ideas:
+
+Mixed mappings for modes (for more than 1d). Adaptive mappings (if so, how to reduce the re-learning effect?). 
+
+When, What, How.All integrated. A paper on that. 
+When - to be addressed by manipulability, quantifying getting stuck, looking at the signal and inferring that the user is having trouble. 
+What - Mode switch? Just blending? Planning based? Heirarchical?
+How - To what extent should the assistance be provided. How to initiate it?
+
+
+
+Ask Jessica, How do people drive forwardds and backwards using head array. 
+
+
+
+
+Robot asks help. Cobots. Manuela - 
+
+
+
+Components for equation:
+
+Absolute value of confidences
+Spread between the confidences. Variance of sum of distances. 
+Variation in individual confidences for -uh and +uh and incorporating that into the metric. Indicates propensity of change. 
+
+Come up with that metric?!??!!!! 
+
+
+
+Meeting notes:
+
+
+Clarify the notes on paper. Algorithm clarification. Notation clarification. 
+
+Describe how the trials were generated.  
+Coding related work.
+
+
+
+
+
+
+Journal call: Frontiers in Neurorobotics
+Exp Design Survery paper? 
+
+
+
+TODO:
+
+Finish up the time node. Make sure the killing of nodes will trigger the file write. WIll the time stamps be matched in a bag file which will be recorded simultaneously 
+
+Test out the scenes with 4 and 5 goals
+Test out 4 different home positions - 4 home positions
+
+
+Test out how to trigger initial home and initial mode easily. 
+Test hA again. 
+
+
+
+TODO:
+
+1. Test out the variations in the algorithm. See how it works. ELiminate component 3. Do max of the confidences. 
+2. Specify 4 home positions - Almost
+	b. Set up the scene properly. 
+3. Specify the two tasks completely. 4 and 5 goals?. FInalize the data collection stuff. Try doing this on your own. 
+
+
+4. Make the switch circuit , some soldering and testing of head array. 
+
+
+5. Try to run multiple arduinos at the same time. One for head array, One for mode swithc interface. Namespace for each serial node and publish topics on each - Done
+6. Create different launch files for different tasks. different interface combinations etc - Done
+7. Test out how to trigger initial home and initial mode easily - Can possibly call the service directl - Done. 
+8. Add respawn to the critical modes
+
+
+
+TODO:
+
+Work on circuit - Done
+Work on making mode interface box - Done
+Set up scenes - one for practice, two for experiments. 
+	2 goal scene for pratcice - one each with different orientation - Done
+	3 or 4 goal scene, for same orientation - task 2 - Done
+	4 or 5 goal scene with different orientation - task 3 - done
+Set up the 4th home position - Done
+
+
+Finalize the algorithm and make sure smooth transitions can be done - Almost done
+
+
+
+
+Test algo from every start home position to every goal in a scene and see if potential field is working alright. Come up with sensible values for the arbitration function - sort of
+	j2 is working good with current algo. field is doing alright some collision with the objects due to angle of apporach what can be done about it;
+
+Write bash script for permission for all ports. To be run at the beginning of the session - minor. May not even be necessary. 
+
+
+All joysticks nodes to have respawn - the mico move it node to have respawn?
+At night start writing the paper again. Work on it parallely - Not yet
+Work on getting the trial script ready. Almost there. Print it out. 8 of them - Done
+Make sure data collection is making sense. That the data recoreded is good for analysis and parsing. 
+Draft email for recruitment of subjects...Circulate it to SMPP RIC etc
+
+
+tps_list = w or wo for all trials for all subjects
+home_list = init home positoin for all trials for all subjetcs
+
+
+TODO
+goal_list = goal positions for all trials for all subjects - Done
+when wo, what is the init mode. Uniform across only wo trials. - Done 
+
+
+TODO (MONDAY):
+
+Tune the algorithm -  The blend function max alpha-attractor velocities. Have too much is frustrating because the user cannot express properly. Maybe increase the cmin. At least 50% confident? Play around with the weights of the two components - long terma nd short term - Done or still doing.
+
+Rewire the circuit - Add LED, space it out. Use longer wires. Print labels for the box - DONE
+
+ADd directory info, argument to take in trial name in the keylogger node - 
+Add publisher for publishing the current mode maybe just recording that will give the number of mode switches, the timings of mode switches. Therefore the task time can be recorded easily. 
+
+
+
+PRINT OUT THE TRIAL SHEET. 
+GET THE CAMERA READY. 
+GET THE SCENE READY PROPERLY. 
+ALSO Add rostopics for /user_vel /control_input /tf? 
+PRINT OUT QUESTIONNAIRE
+
+Pratcice the tasks once again.  
+
+
+
+Run bagtomat on all of ahmetcans' files. Write matlab script to take a preliminary look at how the data looks like. USe that info to modify the experiment. Is pure teleop the way to go? Should I remove rotation help in blending? Should I just use the confidence for computation. In simulation create a heat map for the entire workspace, for ideal mode. This can be computed in code. No need for experiments. However, the actual computrations requires 6 dimension. Maybe just have 3d. G4 tasks. same orientation. 
+
+
+
+
+TODO: FOR STUDY:
+
+Create practice task - DONE. Revised home positions. 
+Create trial list for that - CODING - DONe
+6 trials. Same for all subjects. With blending - DONE
+
+If you can add RED LED. If not, call the trials CAse 1 and Case 2 - NO RED LED - DONE
+
+
+Modify the questoinnaire to be agnostic to w or wo - DONE
+
+Compute the best mode for eveyr trial. Sometimes random matches with the best mdoe in the beginning. This overlap is useful for us.
+ Here are 4 home positions and 2 tasks. 8 answers for these. Can be computed later - DONE
+
+DONE:
+ADd functionality to compute the best mode whenever user initiates a mode switch. Call the self.request_assistance without assignig the result to self._mode - DONE
+
+
+TODO: SIMULATION
+
+Set up a fake scene or the real scene - USE G4 task
+Use different confidence formulations. See if the same algo works. 
+USe different weights for the same algo and see how the results vary. Set up a simple scene. So that results can be interpreted properly. 
+Create heat maps. Compare it with what the user prefers. 
+
+
+
+Sequence of publishers
+
+In Od when assistance requested
+
+assistance_requested -> cdim -> cmode -> publishmode
+
+Regular mode switch
+
+cdim -> cmode -> publishmode
+
+All those cdim time stamps without assistance requested came from regular mode switches. In order to line up the time  stamps, look for alignment across the matrices
+
+For head array, to identify cyclical nonstop switching, look for subsequent ones and culminate in the one which has a higher difference time against the next one. 
+
+
+Symbol	Meaning
+ns	P > 0.05
+*	P ≤ 0.05
+**	P ≤ 0.01
+***	P ≤ 0.001
+****	 P ≤ 0.0001 (see note)
+
+
+Paper writing, 
+
+Finalize math. Include look ahead math. Try to prove that moving in a circle about a point will essentially give the same answer? In simulation. 
+
+more simulations plots. 
+
+Vary look ahead factor. 
+
+
+
+Different experiment idea:
+
+Instead of telling the user beforehand what goal he /she is going for. 
+
+Ask the user to pick a mode in the beginning. And then ask him/her to wait for our instruction for what goal to go to... Then the user is required to perform this in minimum mode switches. 
+
+At some point during the task we can ask them to stop. And then we can ask them to change the mode and be ready. We may or maynot change the goal. If we change it then again the goal is to reduce the number of mode switches. 
+
+Create interface picture
+Move the plots. 
+Regenerate the plot wqith correct labels.
+
+##############################################################################################################
+##############################################################################################################3
+#############################################################################################################
+#############################################################################################################
+POST RSS 2017 work:!!!!!
+
+
+The disamb algorithm throws all cues from the trajectory and control history from time t =0 till present. When the disambiguation is requested the algorithm assumes that all goals are equally likely, which the puts the control mode in a "unintuitive" mode for the user. Stage of task completion requires different level of disambiguation!
+
+At the beginning, disamb influence factor should be high. So current algo works. For middle of the execution (assumin that by this stage, the user has a clear idea of where s/he is going), it should be low. That is certain goals are more likely than others. And this should influence the selection of modes. How should it disambiguate vs. how much should it reinforce. At the end of the trial, we are once again starting from scratch should disambiguation should be even.
+
+
+Litertaure survey for disamb stuff:
+
+Legibility literature: 
+Decision theory as applied to human robot interaction: Sunny's work. Rational action. 
+Potential fields in Rottation space. Is there pure rotation in teleoperation? 
+Is there a possibility of incorporating deep learning or any other so called "hot" topics into this research? I should be adept at it. 
+May write all the code in C++ now? To get better at it. Needs compilation? But might be a good gain. Maybe the SEDS obstaclae can be wrutten in C++. Have a good choice of Math library for C++. Dlib? 
+
+
+
+p(g|u_h(0 till t)) markovian assumption on u_h will not hold and will not be useful
+
+
+Read Anca's thesis more, understand the bayesian approach to goal prediction. Generate new ideas. Think about "When to help" aspect. Using time evolving historgrams. Ergodicity with respect to an underlying distribution will probably give an idea of whether the person is getting stuck or not. Manipulibility index? 
+
+A different notion of manipulability index. Traditionally MI purely is concerned about the actual mechanical constraints. The MI is low for near singular configurations and as a result the number of options for the user to get "out" is lower. However, a different notion of MI would be one which is perceptually or cognitively hard for the user. A configuration might be truly hard to manipulate not only due to near singular configuration but also because the human operating the device finds it cognitively and perceptually hard to figure out what the "correct" control command is to bring the robot out of the complicated configuration. Not only configurations are equally hard in that respect. In usual manipulation tasks, singularities rarely happen. However, there are still many configurations, where the user is easily lost and confused and do not know how to get out of the situation. These are the configurations that can be thought of as a low MI due to cognitive burden. And may be it is in these configurations that assistance is more needed?! Is this something quantifiable. Time evolving historgrams can give a decent idea of such spots? 
+
+Feb 13th 2017:
+
+How should the robots be taking decisions. Currently the robot tracks the confidence variable and "immediately" makes decisions as to what goal should it be assisting toward and also via the arbitration function "how" much should the assistance. Is it possible to incorporate the idea of "integrating" evidence over time (drift diffusion) which would then enable the robot to make decisions once the evidence crosses threshold. What about other ideas such as urgency gated decision making. What about utility value function based ideas directly from decision theory concepts. Local Mental Models for reasoning. Can event segmentation kind of ideas be used to help the human in multi stage tasks. An ongoing stream of perceptual data is segmented into bigger chunks to understand and infer what stage of the multistage task the human is in. 
+
+Theoretical ideas: How to quantify the collaboration of human-robot interaction? Stefanos has a bunch of theoteical apporaches, based in POMDP's and bounded rationality kind of concepts. The latest paper proposes a game theoretic model for describing the human robot interaction. A DS based explanations might posit that the human robot system behaves like a coupled oscillator or a coupled dynamic system which then evolved in the state space due to some underlying dynamics and modulated by factors such as task, efficiency, urgency etc. Koopman operator ideas explored by Alex helped to reveal a linearization of the unknown dynamics of a complicated system. However according to him, the differences BETWEEN different users were insignificant which implies that Koopman was only able to capture what the Physics of the system was doing. The impact of the human on the system is through the control signal and the B matrix takes care of it. It might also have to do with the choice of the basis functions and the representation. It might be that in a specific kind of representation the shared dynamics of the human- robot system may be revealed. 
+
+In what dimensions should assistance exist. This woulkd define the "type" of shared control system. What should drive the decision making capabilities of the robot and what is the least amount of perceptual information that will be needed (crucial for cutting down cost). What will be the most important perceptual information that will be needed (mainly for intent prediction and decision making). the "evidence" for the robot is coming from the human (control commands, eye gazing, verbal cues, frustration cues, workload cues (from bio signals), task completion times and number of mode switches indicating task effort) and the environment (obstacles/potential targets). The robot needs to make a decision based on these variables. Should the robot's reward be specified as being more "happy" when its able to help the human more. 
+
+
+Feb 14 2017:
+
+
+Page 13 of DFT Primer:
+
+The idea of a metric dimension along which information is specified and the other is the idea of activiation level of the field which encodes the amount of informatoin about that value. Does this ring a bell of how a control dimension can have more information for better goal disambiguation? Can there be a DFT approach to understanding what the "best-case" scenario for the robot will be?
+
+When human motion command stops- the activation levels drops. Here activation levels can probably refer to the probability distribution over goals given the evidence. After a break, the user can start off and the "peak" of the probability distribution can now be on a different goal and the strength of the peak can depend on how strongly the "dynamics" of the system converges to that peak. 
+
+DFT and drift diffusion give alternate ways to look at how a pdf can evolve in time. 
+
+What is it in what I am trying to do that is going to be different from what I am doing right now? The goal is to indeed come with engineered robotic systems that can successfully  provide assistance to the human in various tasks. But, my hope is that it also results in contributions to the "science" side of things. For example, the RSS2017 work was more like an arbitrary creative work, in which we decided to come up with an equation and tested. What motivated such a formalism. Is it based in how humans might disambiguate. What I am leaning towards right now is to understand how humans might make decisions, how humans might choose to move, when humans might provide assistance and to be able to generalize this and come up mathematical models for this. As a test for the validity of these models, the same models can then be implemented in the robots and see if the resultant human-robot behavior is acceptable/successful. This is sort of the motivation behind cognitive robotics. The primary question is HOW human works. The secondary goal is to see if these cognitive models can be implemented on a robot and analyse the resultant behavior. Models can be at a behavioral level, control level, neural level and what have you. 
+
+A system for proper goal inference which takes into account the past history of control commands need to be established. Prior has been done in this regard. Shervin et al. However, the policy executed by the human was modeled using IOC etc. Simplications of human policy (assumption that human are trying to execute straight line plans even with a control interface) can considerably simplify the computation of the posterior goal distribution given the trajectory history from 0-t. Ideally there has be a time evolving pdf controlled by history of trajectories, inactivity rate, immediate change etc. This sounds an awful lot like dynamic fields. Can DFT ideas be used for performing proper goal inference in the context of assistive manipulation tasks. 
+
+In addition to JUST engineering a goal disambiguation system, can this model explain anything about how a human might be able to perform similar disambiguation. In order to understand that first, we need to identify in what scenarios would humans be performing such kind of disambiguations. That is, in what scenarios would humans try to put themselves, so that they can explore the best of all worlds. 
+
+If the human knows thats the robot is looking for control command aligment to make its decision regarding help, that is the human is given the robot's strategy and if the human also knows that by letting the robot help him/her that s/he would be able to accomplish the task faster and IF the goal is INDEED to accomplish the task faster, would the human end up placing him/herself in a mode picked y the algorithm. This would mean that algorithm is capturing something about how humans might disambiguate. That is the model is able to explain the inner workings. If nueronal correlates are found which corresponds to the different terms in the algorithm, it adds to the fact that the neurons are indeed performing such kinds of computations and the algorithm is NOT just to explain the behavior. 
+
+Can we think of an injury as a "bad decoder module" that alters the natural dynamics? Suppose we have a model for a healthy subject. A model for motor control. What parameeter/alteration can account for injury related changes in motor control? For example, when muscle output is present does it mean that the activty of the neurons are now restricted to the null space? :)
+
+Gershman Paper- can deep nets learn newtonian dynamics?
+
+Compositionality, Causality as discussed in Gershman/Tenenbaum. How is this going to be handy in designing assistive systems that can generalize well across different classes of tasks? 
+
+Given ths scene, the robot and the control interface will the "motor control" of the robot by the human show similarities. How can we perform an experiment that will demonstrate this. 
+
+Causality - Rather than have a discriminative model, that just recognizes patterns (Sid's SVM classifier for mode switches) which does not seek to uncover the underlying conceptual mechanisms during mode switching, have a model which captures the causality (why do people switch modes) will help in better generalization. The system might then only need to see a few examples of humans performing a task and doing mode switching and might be able to generate new examples of mode switching. An idea for tehory of mode swicthing. Do people go for big gains in the beginning and smaller later. Is that a concept that can be captured in these models?
+
+Cerebellum seems to the hub for adaptation of forward motor models. How does the knowledge of intuitive physics, intuitive psychology  
+(from Tenenbaum's terminology) etc., help in changing the adaptation rates during learning. 
+
+
+UNDERSTAND PGMs REALLY REALLY WELL. That might be the key for me to understanding Bayesian inference. The visual aspect of PGM has always helped. 
+
+Look into examples of Bayesian modeling. Code if possible. To see how EXACTLY the form of the priors are chosen and how EXACTLY are the parameters of the model learned. 
+
+
+Can motor injury be modeled as a mutilation to the PGM that is at work for uninjured subjects. If so, inference on the mutilated grpah (which "encodes" the injury), can possibly predict how the behavior might be altered?
+
+*****************************************************************************************8
+***************************************************************************************8
+***************************************************************************************8888
+
+SPRING 2017. 
+
+The perception system is robust enough to identify the "different" objects in the scene. The grasp detection system is able to generate decent enough "grasps" for different geometric shapes. by combining these two systems, it will be possible to determine what is the "best" grasp for a given objects. How to do this? Identify object using Alex's system. Use Sid's system to generate grasps for each object. Depending on the object pick one of the many grasps generated. 
+
+none of these systems, try to make 'sense' of the scene in front of them. That is given a set of objects that have been recognized by the system, what needs to be done with it? Can a possible set of tasks be inferred from the scene description. For a human if s/he sees a clean plate, a clean cup and a dish rack, the inference that will most likely be made is that of "placing the clean plate and cup in the dish rack". However, if the plates are dirty and the cup is dirty, then that possible inference is of very low probability. How are humans able to make relational sense of the objects in the seen and possibly come up with "tasks" that can be done with those objects. nerating action syntaxes based on scene configuration informed by intuitive physics, intuitive psychology etc.
+
+
+From Anthony Chemero:
+Embodied cognitive scientist go with the idea of Action-oriented representation in dynamical systems. Such representation are geared towards actions as AFFORDANCES (ring a bell? Ashuthosh Saxena). As opposed to action-neutral representations which can THEN be used to create action-producing parts of the agent to guide behavior. There it is not a two step process. This reduces the need for objectivist representations: sentence-like representations of action-neurtal environemnt in a language of thought
+
+This remind of the difference between creating a "caption" for a scence which the describe whta the scene is as opposed creating an action syntax for the scene. The latter is geared towards generating an actions, whereas the former is just about creating an action-neutral representation which THEn can be used for generating actions to guide behavior. 
+
+Am I actually referring to a embodied cognitive scientist's perspective in this idea?
+
+An exploratory phase of interaction which enhance the affordances, which can then be useful for generating proper, inference regarding the possible action syntaxs
+Induction learning, Causalnlearning, Intuitove physics, Intuitive psychologY: how will these ideas help in making such inferences?, Scene interpretation in a way that makes sense for assistive tasks. How can such a "bias" in interpretation be elucidated using ideas from intuitive physics and psychology. 
+
+Examples:
+1. Food in a big container, 2 empty bowls, ladel
+possible inferences
+Its dinner rtime, Use the label to serve the food in the big container to the empty bowls. 
+Use the label to serve the food in the big container to one of the empty bowls. 
+Pu the ladel in the big container. 
+Put the ladel in the one of the two bowls. (Can be done with either bowl.)
+Stack the empty bowls (it is physically possible to do that)
+Scoop the food from the container diretcly using the inidividual bowls. 
+
+2. 
+
+
+
+MARCH 27 2017:
+
+1. Evolving pdist for goals : Can Dynamic Field thoery related ideas be used? The peak of the probability distribution is the location of the most probable goal. And this pribability distibruion is constantly evolving. If nothing happens the the pdist will slowly evolve to become flat. In most cases this pdist is discrete because goals are discrete. This sounds a dynamic confidence measure. More like DFT. self decay, external stimulation?(from control signals), any interactions?
+
+Confidence measure directly cannot be used as a probability measure as they don't add up to one. Can be normalized and then can be interpreted as a probability. 
+
+p(g | s_t, u_t) proportional to c(g | s_t, u_t)
+
+
+If I try to apply DFT ideas, am I interested in modeling P(c_g | s_t, u_t) or P(g | s_t, u_t). P(g) is a discrete probability distribution. How can DFT ideas be used for discrete variables. 
+
+
+125 + 37.50 +59.49 + 330
+12,085.00 + 18,179
+
+Principle of rationality is the guiding principle in Dragan's work. This lets them define cost function and value functions which can then guide the optimization process. How compatible is the princple of rational action within the framework of dynamical systems approach to describe and understand  why people do certain things. If people always performed rationally we would not have the current president. :) 
+
+MARCH 30 2017:
+
+1. BToM by tenenbaum et al. is about understanding the computaional models that work behind the hood in humans. Ideally it would be great to have robots that can read human minds and take appropriate actions so that everything that robot does is in accordance with what the human would want. But since that is not possible, the next best thing would be to develop some kind of computational model which attempts to explain how and what humans MIGHT be thinking and then use that info to take appropriate actions. Many of BToM works relate to how humans make decision in simple experiments. How are these prinicples changed/different when the situation is one in which the human interacts with the robot. 
+
+can we consider, human-human (social interactions), human-computer (simple experimental paradigms, exmaple video games, flat worlds with simple agents), human-robot (assistive robots, companion robots) all to be equivalent?
+
+The Bayesian viewpoint is one way. Is the DS approach another?
+Does the Bayesian viewpoint emphasize representation, since the goal is "decipher the mental state"? Is "Mental state" === "Representation"
+
+
+APRIL 4 2017:
+
+Why am I looking into BToM kind of models? These models are typically used to understand an dquantify human behavior from cognitive point of view. That is trying to reverse engineer what humans might be thinking while making decisions in simple scenarios. Is this useful when it comes to designing robotic systems that need to make decisions when interacting with humans. 
+
+WHAT is the confidence  function?  
+
+In Lake, Tenenbaum One shot, a Heirarchical BM based on COMPOSITIONALITY AND CAUSALITY is proposed to learn a wide rnage of natural visual CONCEPTS from just a single image, much like the way humans would do. 
+
+Is it the fact that these HBMs were augmented with compositionality and causality that enabled them to perform this wide range of concepts. 
+
+"WIDE RANGE" refers to the "generalizability" of the paradigm. This is a problem in assistive robotics when it tries to generalize. In what way is generalization hard? What is this generalization across? Across tasks? Across subjects?
+
+What brings about diversity in a table-top manipulation scenario? Do most of the "tasks" involve some kind of reaching motion. I would think so. Either pick up something (picking is always happening distal from the user), bringing it towards the user (distal to proximal motion)
+
+Reaching movements involved can be classifed as: distal to distal (moving things around), proximal to distal (placing something), distal to proximal (towards the user). What else can be done? In place orientation manipulation? Task sequences. 
+
+Sidd;s work is about understanding task difficulty, coming up with proper metrics for task difficulty et cetera so that these metrics cna then be used to mediate the level of assistance provided. as oposed the "confidence" the system has in the intent. That is provide help when the task becomes more difficult and not when the system is more confident about what the human is doing. Makes sense. 
+
+
+APRIL 5 2017:
+
+My goal is to have a better inference engine. That is, have a better way to infer the human's intent. Given the control signals, the vision input and any other relevant input can the sub-goals and final goals be inferred. And this can't be just a simple cue-based heuristic such as a engineer-defined confidence function. This might work for a limited range of tasks. But when the tasks are multistep involved sophisticated decision making, this would be hard. Furthermore, can this inference engine also give us an idea of HOW people approach reaching tasks? that is what objective function are they trying to minimize, And in order to minimize what "actions" do they take, do they switch modes, do they move. Can you learn this from data?
+
+######################IMPORTANT###################3
+What I want is an agent that will be able to accomplish a manipulation task just like the way ABLE BODIED humans would? This agent should be able to capture the so-called "irrational" behavior by humans (not necessarily trying to optimize task performance etc). It is not JUST about the autonomy being able to somehow accomplish the task. It should be in a way such that when the autonomy performs the task, we should not be able to tell it apart from an ABLE BODIED human. The subject in my case is NOT an ABLE-BODIED human. 
+
+APRIL 6 2017
+
+I have been reading about RNN's and LSTM's. Why is this relevant to what I am trying to do. Can this be used for proper inference. I think so. Assume that the input sequences is a sequence of human control signals. The output, or what we are trying to predict, might be the human intent as encoded in sub-goals and goals. The "memory" aspect of RNNs help to keep "track" the history of trajectories and it can possibly help in better prediction. DFT's can do similar stuff. Not surprising, considering that RNN's are capable of modeling any dynamical system.  
+
+So in essence, is DS approach the way to go? Is RNN essentially a discrete time DS? RNNs and LSTMs can be more general in its capability to model complex non-linear dynamics. LSTMs specifically can model long-term dependicies quite effectively. 
+
+During robotic control by humans, how important is long-term dependencies. For example, a bad choice of control mode in the beginning might have an impact on the number of mode switches later on during the course of the task. 
+
+APRIL 7 2017
+
+In our lab, the dominant research approach focuses on the development of an adhoc assistance system based on some intuition from the designer. Then the efficacy of the system is tested by doing human studies in which, typically, two different scenarios are tested: one in which the assistance system is active and the other in which it is not active. By comparing the performance metrics in these conditions, different claims can be made about how effective the proposed assistance system design is. 
+
+However, these approaches typically do not reveal anything about how the humans are interacting with the robots, their expectations when they interact with assistive robots. That is, the goal is never to quantify human behavior. I consider this to be an important first step because principled knowledge about how humans interact with assist robots, or in other words a computational model of the beliefs, desires and intent of humans is likely to be important if we are interested in building assistive systems that ensure high user satisfaction and task efficiency. Think about it this way. Suppose we have a motor impaired subject and we are in the hunt of a human caretaker for the subject. Different subjects have different desires, expectations, beliefs and do they things differently. Knowledge about all these aspects will help in a better matching process and thereby we can focus on finding the "right" caretake for the subject. 
+
+Ever since I got to NU, the underlying motivation of my research has been to understand how humans work with robotic manipulators given a control interface, given a task. This can be thought of as consisting of two separate questions. 
+
+Given the robot, control interface and task, build an agent that would closely mimic how a human might go about doing the task? Able bodied and motor impaired subjects might have differences. If the ability of the human can be parametrized, then different values of the parameters will induce different behavior from the same model. 
+
+The other questions would be that of building a computational model that is capable of understanding what humans might be "thinking" while the do the task? The first question is more concerned about the "output". The second questions is about representation. Building mental models to account for how humans might "reason" in such contexts. This question is about trying to get a sneak peak into the subject's mind while they perform the tasks. 
+
+RL approaches might be able to answer the first question, assuming the availibility of large amounts of data. The issue of large amounts of data can possibly be alleviated by biasing the learning process by introducing domain specific knowledge and restricting the search space of solution. For example, only look the in the space of action that would generate straight line trajectories, or only allow certain kinds of mode switches. Alex's work deal with this. 
+LSTMs, DS based models can also possibly be used. Not clear how though. 
+
+Bayesian models, (Tenenbaum et al.) can probably answer the second questions. RNNs, LSTMs, DS based ideas can also be used for this purpose. 
+
+APRIL 11 2017:
+
+NOTES FOR ALEX_RSS:
+
+LEarning? quaternion dynamics using neural networks. With explicit linear representation. 
+
+APRIL 12 2017:
+
+Sidd Srivastava Talk
+
+Cognitive Modeling:
+
+Sequentila Decision Making: Representation, Computation and Execution, 
+
+How is domain specificity encoded?
+
+Representation:
+PPL Bayesian Logic
+
+
+***********pOST MSI DEMO***********************
+APRIL 17 2017:
+
+Am I interested in modeling how humans might pick a mode when the goal is not known. Decision making under goal uncertainity. 
+
+Matthias Scheutz Talk - Open world HRI
+
+syntactic category in the parser. generate semantics for the object?
+
+does not take into account object affordances into account. 
+
+APRIL 21 2017:
+Prof. Sara proposed the idea of creating taxonomies of movement behaviors that are grounded in  tasks. This is a little different a simple library of movement primitives as envisioned by DMPs. The taxonomy Prof. Sara proposed has strong groundings and connections to the prevalent task thereby making the mapping between the neural signals and the taxonomies directly relevant to task exection as opposed to just generating movement primitives. 
+
+APRIL 23 2017 SUNDAY:
+
+Quaternion MPC
+
+The dumbest way to do this is to treat quaternions as regular R4 vectors and just use the framework. We know this work for a limited range of the quaternions. ANd might work. How does the quaternion components vary with orientation, The "flips" in the signs etc will cause the framework to breakdown. 
+
+The next step would be learn a NN where the cost function deals with correct quaternion difference. But is there an implicit assumption that when we use quaternion rates, the resultant quaternion is no longer a unit quaternion? Gotta figure out how to incorporate quaternion math on tensors. Can't just use numpy functions directly. Might have to write my own quaternion manipulation functions for tensorflow. 
+S0(3) is equivalent to UNIT quaternion and not any quaternion. 
+
+Understand quaternion ODEs and the how to integrate quaternion ODEs. What kind of guarentees exsist for the quaternions produced by such integrations. Is the unitary norm always satisfied?
+
+Only when quaternions are used to represent rotations quaternion sums and difference don't actually represent the rotations. Otherwise, the sums are defined like as we would expect them. 
+
+The component wise sum of two quaternions result in a quaternion becuase there is no restriction of having the result to be of unit norm. 
+Pure Quaternions (Real part is zero) and Real quaternions (vector part is zero)
+
+April 24 2017 TUESDAY:
+
+Watch out for clipping the angular velocity. By clipping the individual components, the "vector" is altered. Instead, try to scale the magintude down. Nomralize and scaled down would be a better idea. Even for translation MPC. 
+
+****
+
+Regarding confidence based DS: Can I implement the confidence integrator in the control loop itself? There is the normal evolution of confidence. Then there is the "what if" it evolved in a alternate way evolution. 
+
+To be more concrete consider the following scenario. The user begins to operate the arm and moves towards the right. After 3 seconds of the motion, he decided to request assistance. The "evolution" of the confidences from t=0-3 is completely determined by the ODEs and the history of commands is whatever the user provided. At the moment of request, the algorithm's goal is to forward project how the confidences would evolve given different control inputs along different dimensions and the computing the disambiguation metric on the project confidences. In the first version of this algorithm, the forward projection is easy because, the confidences were just functions of space. So one could assume a deterministic plant dynamics and forward project the position given the current input. One could set a time window for which the forward projection should be performed. Let the time window T be 0.5s
+Then for time 3-3.5s the algorithm needs to forward project the ODEs for different control input scenarios. Some of thema re:
+for x dimension: +0.1m/s and -0.1m/s
+for y dimension: +0.1m/s and -0.1m/s
+for z dimension: +0.1m/s and -0.1m/s and so on and so forth. You get the speil? 
+
+If the control input during 0-3 had been such that it was +0.1 in the +x dimension, then there will be a strong bias to that. Which means the confidence will have within itself an imprint of what happened before and "has memory. "
+
+Meeting Notes:
+May 18th - Board meeting. Demos. 
+
+APRIL 25 WEDNESDAY:
+
+Continued thoughts on implementing the DS based formalism for confidences:
+
+During normal operation the "time" variable t is ticking awawy. Suppose the assistance is requested at t_a and the user resumes the operation of the device in the new mode at t_r. 
+We assume that user preferneces don't change in the frame [t_a, t_r]. For the purposes of ODE integration, time has to be frozen for t_a, t_r. For the confidence dismabiguation algorithm, a number of "what-if" scenarios need to be computed. The user ccan proceed in any dimension s/he likes after t_a and the confidences will evolve differently for each scenario. 
+
+t_a to t_a + 0.1 in +x, -x, +y, -y, +z, -z.....etc...
+
+For the normal confidence computation, have two fyunctions. One to compute the instantaneous "confidence" or input to the ODE. (This would be the dot product or whatever confidence function I use normally). The second function will actually perform the integration scheme and the argmax will be performed in this function. By default, the confidences will be 1/ng. The algorithm should check if the user_input is > 0 and only then perform the argmax option.
+
+****************************************************************************************
+****************************************************************************************
+****************************************************************************************
+****************************************************************************************
+THOUGHTS ON QUALS PAPER/PRESENTATION STRUCTURE:
+
+MOTIVATION/INTRODUCTION:
+
+- Effectiveness of the robot assistance relies on its capability to infer the human's intent properly. 
+- What kind of intent are we interested in?
+	We are restricting to a situation in which there are multiple potential goals to which the human can perform a reaching motion using a robotic manipulator. 
+- Why is intent prediction hard? 
+	This is hard because, intent is revealed through how the human interacts with the robot and we restrict to only the control signals generated by the robot (as opposed using other sensory modalities such as eye gaze, biometric data etc). Due to impairment the control signal generated is low dimensional compared to the dimensionality of the system (manipulator) they are trying to control. That is, in order to perform intent recognition, we are being required to "squeeze" as much information as possible from low dimensional control signals. And as a result the accuracy of intent recognition ends up being very low. 
+		Describe modes. 
+		Issues with modal control. 
+
+- How can we get intent recognition better?
+	Model based? vs. Heuristic based. 
+		Model based - Formulate problem as POMDP. Assume that the person has a policy that s/he follows given a goal. Then intent inference can be formulated as a bayesian inference problem in which this probabilty is inverted. 
+
+			THINK THINK: The above statement formulates the HUMAN as a POMDP agent. How can the robot be cast as a PoMDP agent with an information maximizing reward structure? the question is about "eliciting" or bring out more information FROM the human. THINK THINK
+
+		Heuristic based - This assumes that there exists a "direct mapping" between what we get to observe and what the intent. And this mapping (or functional relationship) is a measure of the "probability"/"belief"/"confidence" that the robot has in its estimate of which goal the human is trying to go for in this task. 
+			Suppose I have a bunch of goals. And if we assume that humans try to go to each of these goals by taking a path that is as straight as possible then a metric can be designed which captures the "directedness" of the control signal. 
+			A more naive metric would just look at the proximity to each. 
+			A more sophisticated may combine "directedness" and "proximity" into one. 
+
+			The quality of a good heuristic is that, if the user indeed tries to a particular goal, the confidence in that goal should be significantly different from the other goals thereby allowing the robot to make an accurate judgment. 
+
+- What needs to be done?
+	Even if the control signal dimensionality is low, it is not the case that all control signals reveal the same amount of information regarding human intent. 
+	Take for example, the figure 1. 
+	2D control - restrictive. Suppose the heuristic is about directedness. 
+	Two modes.
+	Come up with a confidence time plot. Bar graphs along time axis. For two cases. One for moving along x, one for moving along y.
+	In the former case, the "distribution" becomes "peakier" compared to the latter where it is flat. 
+	Therefore being in mode 1 indeed helps in revealing the intent more clearly to the robot. 
+	Therefore enabling the robot to "disambiguate" between the two goals much more clearly. 
+
+	The robot seeks to elicit control signals FROM the human so that the intent is more LEGIBLE to the robot. The problem can then be reframed as finding an appropriate control mode to have the user to be in, so that any subsequent control signal issues by the human from that mode, will help the robot to "disambiguate" the goals much clearly. Upon disambiguating the goal clearly, subsequent assistance provided by the robot will be more successful and therefore will hopefully help the user accomplish the task much more efficicently and faster. 
+
+	Therefore in way, this becomes a mode-switch assistance paradigm
+
+	Inverse legibility: Introduce this notion? Cast it properly. 
+
+Related work:
+	how much should this be emphasized on?
+
+Formalism:
+	DIAGRAMS pictures!!!!!
+
+	Ground the whole thing within an example. Every single notation element ground it with the example. 
+
+	Introduce the formalism with groudning in the example. Generate new figures in addition to Fig 2. in which the confidences are represented as a bar graphs in time. This will calrify the "probability distribution" interpretation of (normalized) confidences. From an information theoretic standpoint, the goal is to get the "confidence distribution" more peakier around some goal! 
+	Note: There is a confirmation bias in the formalism? 
+
+

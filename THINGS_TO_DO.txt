@@ -1,0 +1,556 @@
+
+THiNGS TO TALK ABOUT:
+
+1. Deadlines issues
+2. Alternate ideas for experiments: ABout goal distirbution to the algorithm. Or changing the protocol. Start working on journal articles. More elaborate simulations for different confidences. More mathematical proofs? If possible. 
+3. Enhancing the algorithm?
+4. A scheme for automated mode switching?
+
+
+
+For Survey in Experimental Methods in robotics
+Field Robotics literature. 
+BME
+HRI
+
+
+THINGS TO DO:
+
+Test code base in roskinetic
+Enhance mico_base - add home positions, add mode switch interface code to the joy nodes - Done. No home positions as of now. Not needed.
+Set up the new mico_pfields package. to start playing around. install Eigen. Using roskinetic. DONE
+
+Work on deep learning udacity and cv course. 
+READ the OBs Avoidance papers closely. 
+Start designing the code structure for SEDS obs avoidance. 
+
+
+
+
+THINGS TO DO: (Feb 7th 2017)
+
+1. Try to fix the "fixed" joint issue with ros kinetic - tf2-ros helped to fix this. 
+2. Try to implement the basic dynamic potential field. In order to do this we need th end effector cartesian velocity available in the pfield node. /joint_states are available. We also need the Jacobian. Which I think can be published from where the teleoperation stuff happens - or this can be done by subscribing to control_input which is the "issued" velocity to the controllers. This is a fair enough assumption for the pfield most likely because the inner PID loop makes sure that the "actual" velocity if fairly close to the "real" velocity. This will not be the case when the robot starts from zero velocity. The issued velocity will have suddent jumps however the "actual" velocity will be much more smoothly changing. In order to have the "actualy velocity" we need the Jacobian and the joint velocities. This is available in the teleop node. 
+
+
+CS - March 3rd 
+MechE - March - 10-11th ME. Evening demo for Ability lab
+Feb 21st - Elementary Kids. 
+
+
+THINGS TO DO: (Feb 13 2017):
+
+1. Read more. Start collecting papers on decision making, movement etc - DONE
+2. Read more. Consolidate potential field literature survey - TO BE DONE MORE. Attractor Dynamics work was collected. Check the related works
+3. Try to get the ros-kinetic package working. It is already working. Understand what is going wrong with tf2_ros. Why is it not giving the correct answers? tf is giving the correct answers - NOT
+
+THINGS TO DO : (fEB 14 2017):
+
+1. Code. Try to the velocity based p field happening. Subscribe to user-vel in pfield and use it for modifying the trans component of p field. Maybe for the time being use both tf and tf2. Can look into tf2_ros and issues with it later. But if tf2_ros is giving errors, at times, it is very likely that that it will give errors even for other transformations. Beware (mainly for rotation stuff). The pfeilds uses OTHER tf related styuff to look for closeness to base and closeness of fingers to the table. 
+
+tf2_ros has been resolved. Some issues with pfield rotations not stabilizing. Might have to do with the difference quaternion etc. 
+
+2. Read more. THINK THINK THINK. Generate ideas. Generate ideas for HOW robots should be making intention predicition. How should evidence accumulate before the robot commits to a particular goal. 
+
+3. Finish reading the paper for neuroscience class. 
+4. PFIELD PAPERS - Khatib, Koditscheck, Schoner (Attractor Dynamics) - Collected this stuff
+
+THINGS TO DO: (FEB 15 2017)
+
+1a. Read neuroscience. For class. 
+1b. Read/Collect - Schoner/Dose...
+2. Work on coding. 
+3. Hackathon. 
+
+
+KNOBLICH-SEBANZ work, KOSMA
+
+THINGS TO DO: (FEB 20-21 2017)
+
+1. Collect more works on potential fields. Start writing this weekend. 
+2. CODING - Finalize the DMP based pfield modification tomorrow. u_h has been subscribed. 
+To test -  Issue with rotation component of p fields. Some discrepancy is happening. Quite possibly in the computation of diff_quat and diff_theta. Ensure that the rotation happens in the corretc direction - DONE. Was due to mismatch of target quats in different nodes. 
+
+Use u_h to compute the "angle between current u_h and the vector connecting end effector with the goal. If greater than 90 degree don't repel. If less than 90 degrees use the formula. Directly proportional to velocity and inverse proportional to the distance and directly proportional to the cos(theta) - DONE. 
+
+
+3. Start perusing the SEDS obstacle code. Gotta set up the modules (Obstacle classes, Modulation class etc). USe earlier C++ version for reference. DO checks for not allowed matrix operations. Install armadillo for numerical stuff in C++. 
+
+
+
+
+THINGS TO DO: (FEB 22 2017)
+
+Hackathon kind of:
+1. Update mico_conf_disamb (ros kinetic joy 3. add tf on top) - DONE
+2. Update mico_base (ros kinetic. add new tf2 stuff. add mahdieh packages to ros kinetic.)
+
+
+3. Finish basic modifications. Way to test it is to turn of velcotiy control. And go to a position within the obstacle field. And then give uh of differnt magnitudes and directions. Maybe add another "arrow marker" to show the repel component. It will be very clear that way. Tune the parameters - ALMSOT DONE. Test on hardware and more tuning tobe done
+
+4. Start looking at SEDS code. Make notes. Plan out the C++ classes. Earlier when I implemented it in 2015, there were some issues of the matrices blowing up. It was probably due to a mistake in porting over code from matlab to C++. Or it maybe because some edge conditions were not taken care of properly. 
+
+5. Look into literature. How to avoid self collisiions using pfields. 
+
+
+
+
+
+Meeting notes:
+
+1. Talk about the classes for next quarter. Maybe submit petition to ME for approval of IEMS/. - DONE
+2. Talk about quals and the requirements that the proposal has to be submitte dby the end of 3rd year _ GRAD HANDBOOK STUFF
+3. Talk about the compu neuro science workshop in June. CosMo (FREE) and CBMM (2000$)
+
+Arguments for: Modeling experience, Rigorous statistical skills, "Neural Component" of my major, Not just a roboticist, but more like neuroroboticist who is also interested in understanding the human mechanisms at a behavioral as well as a neural level. 2 weeks in summer. All covered. Help with applications.
+
+
+4. Currently spending time reading literature survey. Two goals in mind. One is the immediate ones, paper for 499, paper for neuro science. Second is related to understanding the broader perspective how different areas are/have informed the work that I do, and to slowly identify white space. One year for proposal. The coming year I want to build a solid understanding of the field
+
+
+THINGS TO DO:
+
+1. Look into application seriously. Email Mussa Ivaldi, regarding quals committee. 
+2. Read Neuro class stuff. Maybe decide on Neuro paper as well. 
+3. Finalize on different subsections for potential field paper. Can't keep going. Khatib, Koditschek,
+4. Start looking at matlab code. Write obstacle class. 
+
+
+
+
+THINGS TO DO:
+
+1. implement 3d obstaclae avoidance for SEDS in MATLAB. Check the accuracy of the code. Start writing the obtsacle - DONE
+2. Start reading neuroscience 
+3. Application 
+
+THINGS TO DO (march 1 2017)
+
+1. Finish the SEDS implementation - DONE
+	
+2. Start reading cerebellum - DONE
+3. Look into BMI and M!/Reaching ideas. Make notes for tomorrow's meetings - DONE
+
+Notes: Look into concept learning, program induction and scene understanding?. How to perform better inference on intent. 
+Can intent be represented by a probabilistic models and then can intent inference be thought of as performing inference over these 
+
+THINGS TO DO (MARCH 4 2017):
+
+1. Finish SEDS implementation. Test it with a simple obstacle ON the table, which will ensure that the robot is always ABOVE the obstacle and therefore will NEVER go below the obstacle. TO absolutely ensure this we will need to model the TABLE and big box. 
+
+Its affecting rotation velocities for some weird reason. Its not getting affected during dybamic potential fields. There is some nan issues going on at the end point. Make sure necessary checks are done. 
+
+
+2. Systematically collect papers on BMI, and multiple motor plans in the cortext (CISEK, KALASKA etc). Start making structural notes for the BMI paper - A little better.
+
+3. Continue collecting pfield papers. Start Structuring. 
+4. Collect all necessary documents for the summer school appliucation.
+
+5. Continue reading - Look into deep learning and how it can possibly inform us about how cognition might work in humans.
+
+Start working on application tomorrow:
+
+the diversity of my background helps me to synthesize ideas from different domains for the task at hand. The current challenges in the field of my research which is of assistive robotics, will require the robotic behavior to be informed by CogSci. This is a field which closely works with humans and is only useful if it serves the pyurpose of assisting. Generalizabiulity across humans and tasks is a far fetched goal right now. Incorporating more fundamental conceptual level ideas into the models might help in a more generalizable as well as princpled robotic systems. 
+
+How do people behave when asked to interact closely with robots? This is a question that is of paramount importance when the research problem that one is trying to addres sis that of building assistive human robot interaction systems that will hopefully improve the quality of lives of people with motor impairments. Motor impairments such as spinal cord injuries and brain injuries affect people in different ways and as a result the needs are very different from person to person. A generalizable assistive robotic system is currently a far fetched dream. Robot Learning form demostrations etc provide solutions that are limited to a specific task. As a result of my diverse training in physics, music, music technology and robotics I approach challenging problems such as these from a myriad of angles.  
+
+
+Courses from different departments (AI, ML, Neuroscience). Online courses.
+
+
+I have been using MATLAB as my primary 	scripting and protoyping tool since 2013 when I started my Masters. Ever since I have almost exclusively used Matlab for all of my coursework (in AI, Pattern Recognition, DSP, ML for Robotics, Control Systems, Robotic Manipulation). I extensively use the control system toolbox and the statistics tool bxo for my work and I have also explored OOP in MATLAB. I am also comfortable with Simulink which was the main workhorse for developing the system for my Master's Thesis. 
+
+
+The aim of this course is to bring together students from a wide range of backgrounds. An excellent computational neuroscientist may have little knowledge of cognitive science or computer science; an expert on machine learning may know a bit about neurobiology but little about human cognition and its development. As a prospective student, please explain where you fit in this >3D space of expertise and what you hope to gain from the course. (Be succinct; half-page maximum.)
+
+
+The demarcations between the different fields such as neuroscience, cognitive science and robotics are increasingly becoming blurred and as someone who has been able to pursue a multiplicity of domains (physics, music, music technology and robotics) I think that I am geared for the multifaceted apporach to problem solving that the field requires. My training and my background lets me approach research from a myriad of angles and I realize the importance of holistic thinking that requires one to go beyond their own choice of domain. My current work mainly focuses on developed shared control architecture of assistive robotic systems that are "intelligent" enough to understand the human's intent to some degree and provide appropriate assistance. However, these assistance paradigms are too task specific and lacks the generality possessed by a human caretaker. I am intrigued by humans learn and how they generalize and I hope that this course will help me gain a better understanding of mathematical formalisms of human learning and how they generalize skills across domains. With this knowhow I hope to approach research in my domain in a more principled manner.
+I hope to gain better understanding of the state of the art approaches to cognitive modeling and computational neuroscience with the intention to develop CogSci inspired robotic behaviors that are scalable and generalibzale in the domain of assistive robotics. 
+Knowledge of motor control systems in the brain and the alterations to the dynamics and behavioral aspects of the motor system as a result of lesions to the brain and spinal cord will most likely help in a systematic and principled approach to developing assoitive robotic systems.
+
+We do not expect you to be a master of all the relevant disciplines. On the other hand, you will get more out of the course if you have made an effort to broaden your scientific background. Please explain what steps you have taken in this direction. (Again, be succinct; half-page maximum.)
+
+Diverse experience in research and software development. Coursework outside of home department during Masters and Phd. Online courses (from Coursera, Udacity etc) and own studies in the areas of neuroscience etc. 
+
+Describe your level of experience with MATLAB programming. (Half-page maximum.)
+
+
+
+
+THINGS TO DO: (MARCH 5th 2016)
+
+1. Trouble shoot SEDS (8 till 9:30-10:30) - DONE
+2. More literature survey (11:45 till 2-3) - HALF DONE
+3. Work on application 3-4:30 or so - SOME IDEAS
+4. Deepa LEarning Udacity
+
+
+THINGS TO DO: (MARCH 6th 2016)
+
+1. Prepare presentation (6:30-8:30) - DONE
+2. Work on application (8:30 - 11:00) - A LITTLE BIT
+3. Work on reading and maybe start sketching the paper properly - NOPE
+4. Read Basal Ganglia - NOPE
+
+THINGS TO DO: (MARCH 7th)
+
+1. Finish and rehearse presentation - DONE
+2. Read Basal Ganglia - 1 Down. 
+3. Work on application at night with Ranjani
+4. More PFIELD realted lit survey and maybe try out two obstacles in seds code. Fix nan issues for Matrix modulation (put if conditions)
+
+
+THINGS TO DO: (MARCH 8th)
+
+1. READ BASAL GANGLiA - DONE
+2. more potential field. Make notes about paper. Look into Khatib, Hogan etc. Look into Koditshcek. Generate ideas regarding incoportaing GR ideas into navigation. Look into the first chapters of Gravitation book - SOME DONE
+3. More BMI papers - NOT
+4. Work on application - Work on this later - DONE
+
+THINGS TO DO: (MARCH 10)
+
+1. READ BASAL GANGLIA and post question - DONE
+2. Work on data collection if  I go to RIC - DONE
+3. Work on Brenna's Reco letter - ALmost Done
+4. start sketching potential field papers - DONE
+5. Transcripts - DONE
+
+
+
+Figure about whether the undergrad lab qualifies. 
+If it qualifies whether I can TA
+
+If it doesn't qualify
+
+
+IMMEDIATE READING:
+
+1. Action understanding as inverse planning - baker, tenenbaum
+2. Childrens understanding of the costs and rewards underlying  rational action -  Jara ettinger, Tenebaum
+3. Structure and Strength in Causal induction - Griffiths/ Tenenbaum
+
+
+
+
+
+
+*****************************************************************************************8
+***************************************************************************************8
+***************************************************************************************8888
+
+SPRING 2017. 
+
+1. Plans for reading: Refer to the chunk of text at the bottom of the page
+2. Plans for extending the formalism in the RSS paper into journal. Look into lietrature which does probability distribution over goals given trajectories from 0 till time t. 
+3. Continue to look into the pfield stuff. Understand the topology concepts that is used in Ratliff's papers. 
+4. Start collecting papers from the scholar google citations: Especially related to Deep L, and Deep R-L
+
+
+March 22 2017
+
+1. look into further ideas for the disamb project and generate concrete plans for improving the set up - adding "history" to the algorithm. Past information can't be thrown out. An evolving histogram of how each goal is favored. NOT YET
+2. Look into the riemannian manifold learning - the codebase and get it to work and try out sample data - READING - PARTIALLY DONE
+3. Understand riemannian space formulation for potential fields - tangent bundles, geodesic flows etc - Lavalle Planning - DONE
+4. Be systematic with deep learning and coursera courses - second priority, MAYBE at home. 
+5. Prepare email for Brenna. (Final week of the quarter. Worked on papers for the classes. Further plans. If IRB approved, continue to work on the project. improve, start recruiting more subjects. Reformulate. Prepare for Quals. Meanwhile in the background will try to implement yet another obs avoidance using riemannian. Reimannian learning etc. ) - DONE
+
+
+Meeting Notes:
+
+1. Wrap up quarter - DONE
+2. Plans for this quarter - Conf disamb, course work (decision theory blah etc). Quals. Consolidate obs avoidance. Add riemannian based stuff - DONE
+3. Meeting with Lee's group confirmed - DONE
+4. Anything about TAship - DONE
+
+
+
+MARCH 23 2017:
+
+1. Think about confidence disambiguation a little bit. Maybe implement a crude histogram kind of thing to keep track of the best inferred goal. ANd think of a way to use that info to influence the confidence algorithm - WORKED ON FIXING TRHE CODE FOR ROS KINETIC. REading Dragan's thesis - LITTLE BIT
+2. Read about riemannian geo - understand vector fields in tangent spaces of a general manifold. Understanding how the transformation between regular psace to curved space should happen. Refer to Ratliff paper.
+
+
+
+
+MARCH 27 2017:
+
+1. Generate ideas for time evolving confidences. Refer to research thoughts file. Continue to read Dragan's work to understand how those people estkmate P(G| trajectory) - SOME. Implementing differential equations for confidences. 
+
+2. Read Ari's paper suggestion: Generate some ideas for the same. 
+READING- NOT
+
+3. Look into the riemannian machine learning toolbox. Get it installed and get something working - NOT
+
+MARCH 28 2017:
+
+
+1. Install MATLAB on ym machine - DONE 
+2. Read Ari's Paper at 10A - DONE
+3. Read Tenenbaum etc on train - DONE
+4. Set up tensorflow and reimannachin machine learning on Lab machine - DONE
+5. Look into how DFT related ideas are implemented. That might come handy for confidence evolution over time -  A little bit. 
+
+
+MARCH 29th 2017:
+
+1. Read for class: First thing in the morning - DONE
+	Somewhat similar ideas: decision theory -> inidivudal, game theory -group. Didn't know that. Cite my own RSS paper about design. Top-down, bottom-up. Maybe reference music. 
+
+2. Think about differential equation that would capture the probability distribution - Read action understanding, Dragan, Bayesian Inference, DFT -
+	Found some github code stuff for DFT. Think about what exactly needs to be modelled. 
+	Confidences seem to be good candidate. Normalized confidences can be considered as probabilities. Vector of probabilities evolves in time. This IS the probability distribution of current goal given the control inputs. Is past finromation affecting it. It will through the dynamics. If the time constant is high, the impact of past values of probabilities will have a bigger impact on current probability. Try solving some differential equations in matlab for practice and play around with some of these values. 
+
+	In the disambiguation calculation how should the forward projection of confidences be affected by the past history. 
+	From time t=0 to t all n_g confidences have evolved according to the differential equations. the control command used for all n_g confidences is the same and is equal to the actual control command issued by the human. During the disambiguationc omputation, we are essentially looking at the impact of different control commands (that would in turn "move" the robot to different locations) on the confidences. 
+
+	How should the "interaction term between confidences"  be designed. Each confidence has its own decay rate. the confidences are always non-zero. which means, if the "input" term in the diff equation is the confidence there is always a component that pushes the confidence to rise, unless the decay constant overpowers that. the fact that the user is going towards a particular goal should produce "excitatory" effects on that goal's confidence and produce "inhibitory" effects on the other goals confidence. The inihibitory effects is the cross terms probably. Can be coupled linear differential equations. Or coupled non-linear equations. 
+
+3. Work on edits of IRB if she is around - 
+
+March 30 2017:
+
+1. Email Lisa Linn clarifying the edits - Is that all I need to do? -  NOTYET
+2. Try implementing a simple solver in the ros node - NOT YET
+
+MARCH 31 2017:
+
+1. Paid Fees - DONE
+2. EMail Lisa - DONE
+
+l-linn@northwestern.edu 
+
+Dear Lisa, 
+
+I am writing to you since my PI Dr.Brenna Argall asked me to clarify some of the points raised during the last correspondence. 
+We wanted to clarify that, in addition to incorporating all the edits tracked on the consent form that was returned to us and updating the documents on eIRB, is there anything else that we should be doing? 
+Note that besides incorporating all the edits suggested by you, we are not adding any more content to the IRB application or the consent form. 
+
+We would appreciate it, if you can clarify this and 
+
+3. Homework - Read circle of design - DONE. 
+4. Look into BToM code etc - LITTLE BIT
+
+APRIL 2 2017:
+
+1. Work on homework. Start writing/notes. Read the content fast again. Work on the inidividual questions. Make bigger points to includ - DONE
+
+2. Think about my project and BToM ideas - SORTA
+3. Read more papers. Make notes - GOT SOME PAPERS. HAVEN't READ
+
+APRIL 3 2017:
+
+1. Read papers on learning, Bayesian inference. Think of reformulating my project in bayesian terms. Understand how to go from symbolic representations of probability distributions to concrete instantiations. Bayesian models are needed for goal inference. This will naturally keep track of user history etc - LITTLE THOUGHTS
+2. Read optimization. Maybe also get Boyd's convex optimization. Start Convex optimization course on Coursera - GOT THE BOOK
+3. Finish IRB edits and email Brenna - DONE
+4. Submit application. Start looking into CosMo application as well - WORKING ON WEBSITE, CV updated. 
+5. Start thinking about optimization project. Can i tie it bcak to the work I done for my first paper - NOT DONE 
+
+
+APRIL 4 2017:
+
+1. Work on website tonight. Be done with it. Submit application - ALMOST DONE. 
+2. Read Bayesian inference. Try to see if it can be used explicitly - A LITTLE BIT. 
+3. Think of dynamics for confidence. DFT inspired. these would be an alternate to bayesian model - 
+4. Deep Learning Course. Get Docker to work. Maybe reinstall the tensorflow - DONE. Go through tf tutorials - STARTED
+4b; PGM - 5 videos done. 
+5. Read optimization chapters. Refresh OCT notes. Regarding "general" optimization flow - Arora_2 DONE, Arora_3 DONE
+6. General reading - ALex READING - DONE
+
+
+APRIL 5 2017
+
+1. Organize GIT. Make MATLAB CODE folder. Dump MATLAB code, Final touches to website- DONE
+2a. Finalize application. Upload stuff, Update LinkedIn(To be done) - DONE. 
+2b Email Brenna, reminder - DONE
+4. Read Bayesian stuff. Think about a good experiment - STARTED
+4b. Code installation. TF tutorials. Maybe try installing tensorflow using pip. Outside of docker - DONE. 
+5. Deep Learning course and PGM course - DONE
+6. Read ARI paper - NOT DONE
+
+APRIL 6 2017
+
+2. Start organizing material for CosMo - (Evening)	
+3. Read ARI papers and collect thoughts - Morning till 10. -  DONE
+4. Bayesian stuff, Inference, Experiments thoughts - Rest of the time - DONE
+
+
+APRIL 7 2017:
+
+1. Supplementary material for rational behavior paper. Understand methods. 20,21,35 , references, cue based heuristics. Maybe there are better ways to formulate confidences - HALF
+2. Look into RSS workshops. Lay down a plan. Will resubmit the paper to the workshop if it does not get accepted for the conference - DONE. With Alex
+3. 
+4. Maybe start preparing the statement for CosMo. Look at other summer schools as well. 
+
+APRIL 8 2017:
+
+1. Taxes - DONE
+2. NN code - half done. 
+
+APRIL 9th 2017:
+
+1. Work on optimization - DONE almost
+2. Work on CosMo essay. To be donec by tonight - fINISH this tonight
+3. Work on keras modeling - SORTA - DONE at least for the itme being
+4. PGM - NOT
+
+APRIL 10th 2017:
+
+1. Finish optimization homework
+2. Finish application - 7-8 - DONe
+3. Prepare for Brenna meeting. Discuss ideas. Bayesian concepts, LSTM for predicting mode switches for better goal inference - DONE
+Meeting notes - dONE
+
+1. Set up Quals demo. Email Sandro? Abstract info? Abstract 2 pages. Last week of May week of 22nd. 
+2. Workshops - 
+3. 
+
+************POST MSI DEMO WORK******************
+
+APRIL 17 2017:
+
+1. Work on quaternion learning. Prepare midwest workshop poster - NOT DONE
+2. Work on optimization homework - Read material once again. And start coding - LITTLE BIT 
+3. Think more about the project. NEed to modify the experiment - NOT DONE. 
+4. Compose email for Todd and Sandro regarding qualifiers. Send it out by tonight - DONE 
+
+APRIL 18 2017:
+1. Work on quaternion learning. Prepare midwest workshop poster - LITTLE BIT
+2. Work on optimization homework - Read material once again. And start coding - HALF DONE
+3. Think more about the project. NEed to modify the experiment - (READING ON INDUCTION LEARNING?)
+4. Read ARI meeting paper. in the train - DONE
+
+Meeting Notes:
+
+1. Quals:
+2. Regarding meeting on Thursday. What should we bring. What to prepare. 
+3. Work
+
+APRIL 20 2017:
+
+1. Homework - DONE
+2. READING - DNC, Memory Augemented NN, Lake Phd Thesis
+3. Miller Meeting - get videos. 
+
+April 21 2017:
+
+1. Work on model learning. play around with keras. Maybe even try koopman control on the real arm - DONE
+2. Finish and submit homework - DONE
+3. Push code from workspace so that the Model+MPC framework can be tested in simulation - DONE
+4. Leich Hochberg. Generate some ideas for Miller collaboration if possible.
+5. Think about the project. Possibly implement the DS based confidence system into the ROS node. To see how the confidences evolve while the node is running. The challenege would be have the same DS evolution be forward projected to perform the disambiguation computation. Should be doable. 
+
+APRIL 23 2017 - SUNDAY
+
+1. IMplement MPC on quaternion -  THe naive formulation. 
+
+APRIL 24 2017  TUESDAY
+
+1. Finalize MPC control for quaternions. Work on poster template with Alex - HALF DONE
+2. Confidence as DS - Work on for some time if possible - A LITTLE BIT
+3. Work on project ideas for class.  - DONE
+4. Measure table dimensions and let Brenna know - DONE
+5. Email Sandro - DONE
+6. Setup Doodle -  DONE
+
+APRIL 25 2017 - WEDNESDAY
+1. Finalize Abstract - MAYBE ADD ONE MORE LINE REGARDING END TO END
+2. Look into quaternion control formulations - SOME
+3. Work on designing the confidence ODEs. Implement a simple euler integration scheme for confidence updates in the blend node - DESIGN THOUGHT OF
+
+APRIL 26 2017:
+
+1. Discuss project - DONE
+2. Finalize Abstract - with Alex in person - DONE
+3. Start implementing confidence stuff in ros. everything compiles DONE
+
+APRIL 28 2017:
+
+1. SUbmit abstarct - DONE
+2. RSS Review study - STARTED
+3. Discuss project - DONE
+
+APRIL 30 2017:
+
+1. Class stuff - Kind of
+2. Project document - Add stuff to it - DONE
+3. Read about review and make notes regarding the review - HALF ASS 
+4. look into quaternion contorl - NONE
+
+MAY 1 2017:
+
+1. Prepare for Brenna meeting by reading lietrature suggested by reviewers. Maybe look into preliminary equivalence relation between my approach and information gain. Is it posisble to prpve that the algorithm that I have always results in an increase of infomration gain or equivalently a decrease in entropy. 
+
+2. Work on project proposal - DONE.
+3. Look into quaternion control closely. Need to get positive results this week. 
+4. 
+
+
+MAY 2 2017:
+
+BRenna Meeting
+
+1. Looked at reivew stuff. Active sensing. PoMDP. 
+2. Implemented the ODE based confidence in ros node - 
+3. Midwest Robotic Workshop. Looked into quaternions a little bit more.
+4. Classwork 
+
+
+MAY 3 2017:
+
+1. Email Lance - ALL SET
+2. EMail reading paper to argall lab - TO BE DONE
+3. Work on presentation for class -  DONE
+4. Think solidly about modification for work - SORTA
+
+MAY 4 2017:
+
+1. Email Lance: First thing in the morning - DONE
+2. Email paper: Think for max 15 minutes NOT YET!!! - DONE
+3. Work on MWRW stuff - SORTA!
+4. Read class stuff and look into homework - DOING
+5. Start compiling questions and thoughts regarding quals presentation. What needs to be added. how to present content. 
+
+May 6-7 2016:
+
+1. Work on homework - DONE
+2. Read for class project. Make notes. Start doing the survey - SORTA
+3. Prepare for class presentation gather material. Focus on the readings - READ A LITTLE BIT
+4. Start implementing and looking into the possibility of LQR control on quaternions. First try to understand if it is possible. If it is do it. If not, see linearization etc will work. 
+5. Start preparing document for quals. Start lifting text from paper. Think of edits for the paper. 
+6. Prepare for reading group. 
+
+MAY 8
+1. Read presentation material, make notes - DONE
+2. Read reading group paper 
+3. Compile thoughts for quals. Come up with an outline for presentation and paper for discussion with Brenna. 
+
+
+**********************************************************************************************************************
+**********************************************************************************************************************
+**********************************************************************************************************************
+**********************************************************************************************************************
+
+
+GENERAL:	4-5 videos of PGM and 4-5 pages of PGM textbooks
+			4-5 videos of DL and 4-5 pages of DL textbook. Also implement and read code. Undertsand tf and keras
+Books: Statistical Decision Theory and Bayesian Analysis
+Authors:
+DANIELE BASSETT, KONRAD KORDING, GREG SCHONER, MUSSA-IVALDI, Daniel Koditschek, KARL FRISTON, CMU GUYS (DRAGAN, STEFANOS, ADMONI) , JOSH TENENBAUM, SAMUEL GERSHMAN, STEFAN SCHALL, EMO TODOROV, JOHN KRAKAUER ( Motor Learning, Neurorehabiltation)
+
+Areas:
+Decision Theory, HRI paradigms/modeling, Decision Making in Brain, Brain as an optimal machine, Navigation functions, ,  Exeprimental DEsign in psychology, HRI 
+
+Bayesian Decision Theory - Kording
+OPtimal Control Theory - Todorov, Kording
+Active Inference and Free ENergy Principle - Friston
+Deep R-L - UCBerkeley Guys, DeepMind, Gershman, Tenenbaum
+Dynamical Systems approaches in Neuroscience and Neurorobotics - Bassett, Schoner
+Rl and Neuroscience, Bayesian Theory of Mind, Bayesian Inverse planning - Tenenbaum, Gershman
+PGM and Bayesian Inference -  Koller. 
+
+PReparation for Summer School:
+
+1. Review of Calculus, Linear Algebra, Probability, Stats
+2. Reading Cognitive Neuroscience. 
+3. Diong Deep Learning, CV, Comp NeuroScience class on Coursera. 
+
