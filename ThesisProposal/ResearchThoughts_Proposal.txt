@@ -1,0 +1,25 @@
+One possible are for a thesis proposal would be exploring Information Theory ideas as applied to HRI. 
+
+Characterizing information transfer between interacting agents in HRI. This is agnostic to a specific robotics context. However, maximizing information transfer can possibly the goal in any HRI situations. This is because, seamless communication and interaction is achieved when this happens. Can we possibly ground this in intuitive examples. 
+
+What kind of literatire needs to be studied?
+
+Information measure computed on time series data. How "information measures" evolve over time between and within dynamical systems? 
+
+How can dynamical systems ideas be employed in understanding the "behavior" component of HRI.
+
+San Liang, Richard Kleeman's work on information transfer in dynamical systems. They derive information transfer measures when the dynamics are fully known. In most cases, researchers deal with data directly, using 
+	1. Time-delayed mutual information
+	2. Transfer entropy by Schrieber in the context of Markov Chains. 
+
+The examples they work with a simple low dimensional DSs mainly for illustrative purposes. 
+
+Use RNNs to model the dynamical systems. In this case, the human and the robot. Collect data for how humans operate a robot. This will be a way to train the RNN that represents the dynamics of the human. Have a dynamical system (maybe explicitly defined) for the robot. Or learn it using LfD kind of ideas such as SEDS. 
+
+Explore ways in which two RNNs or a network of RNNs can "transfer information" via some kind of conduits. The coupled system might reach some kind of a attractor state in which the information content is maximized, intent is clarified, interaction becomes seamless, ambiguity is reduced, legibility is higher, task execution as a result of seamless interaction is also enhanced. 
+
+Does this sound like different regions of the brain interconnected?!! 
+
+
+https://www.mis.mpg.de/ay/index.html?c=projects/embodiedai/embodiedai.shtml
+http://homepages.herts.ac.uk/~comqdp1/#itiip -  Daniel Polani

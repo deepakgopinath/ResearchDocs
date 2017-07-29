@@ -1,0 +1,37 @@
+***************POST PHD QUALIFICATION THOUGHTS***************************
+
+
+MODELS DESCRIBING HOW HUMANS INTERACT WITH MANIPULATORS
+
+VERY high level idea:
+
+Models for describing how humans work with robots. That is given the state of the environment (spatial distibution of goals etc), state of the robot (current position, velocity etc), control interface and mapping (how restricted is it) and various other info, how would humans go about selecting actions (action set will include movement along different directions as well mode switches)
+
+Models for how humans works with robotic arms. Given this, models for when the humans needs "assistance" for the robot?
+
+POMDP formulation for human interacting with robots, with "mixed" action space. Actions can include (motion related actions as well as mode switch related actions)
+
+
+INTENT INFERENCE SCHEMES USING INFORMATION THEORY, PERTURBATION ETC
+
+Rather than relying on heuristic methods for intent inference, ground the formlaism is more formal information theoretic ideas. Make the intent inference scheme not tied to the underlying shared control paradigm. That is, even if heuristic methods based on confidence functions are adopted, don't necessarily have to force the intent inference module to fit the limitations of the blending paradigm. Which means that alternate for sharing control should be adopted. That is, don't have confidence mediate blending factor etc. 
+
+What should control the "blending" paradigm? What should be the blending paradigm. Can task difficulty be a factor (Sid's work)? Can manipulability index be a factor? 
+
+
+LESIONED MODELS CAPTURING THE EXTENT OF INJURY.
+
+Build models that capture uninjured subjects behavior. 
+Parametric tweaking of the built models captures the "injury" of the subject.
+The behavior produced by such lesioned models will ideally match the behavior of an injured subject. This means that such lesioned models could be used for predicting the behavior. 
+
+the taxonomy of injuries have been well studied. That is, the effect of different levels of spinal cord injury, can be predicted fairly well. 
+
+If humans are indeed optimizers at some level, how does injury affect the underlying cost function that is being optimized?? This is similar to how "stroke" affects "mechanical impedance" and use this info to built prosthesis that will make up for the difference in joint impedance between uninjured and injured subjects. 
+
+
+WHAT, WHEN AND HOW OF ASSISTANCE IN ROBOTIC MANIPULATION?
+
+IDENTIFYING WHEN TO INTERFERE. Based on the injury there might some difficulty in getting the task done. which the subjects may not mind. However, in certain situations, the impact of the injury would be too much that there would be no way out but to seek assistance. It might be that even uninjured subjects may have issues in those kinds of situations. yoshikawa manipuliability index was thought of as a measure to determine whether the user is in troublesome spots. Close to being singularit, however, needs not directly correlate to cognitive difficulty in controlling. For example, at the edges of the workspace, the robot might be close to singularity. However, from a cognitive perspective there is nothing confusing about this scenario. That is, the user might be able to figure out quickly that the "limits" have reached and that s/he needs to move away from. However, if the robot arm gets all crooked due to "bad"/poor planning decision made earlier, then it might be hard to get out of that situations. Being in crooked positions is different from being clos to singularity. What metric(index?) would capture the crookedness of a configuration. 
+
+How often does a robotic arm get into such crooked positions due to poor control planning/scheduling from the user? If it hardly happens, then the approach would never be used for naything. 

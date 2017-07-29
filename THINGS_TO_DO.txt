@@ -515,7 +515,7 @@ May 6-7 2016:
 1. Work on homework - DONE
 2. Read for class project. Make notes. Start doing the survey - SORTA
 3. Prepare for class presentation gather material. Focus on the readings - READ A LITTLE BIT
-4. Start implementing and looking into the possibility of LQR control on quaternions. First try to understand if it is possible. If it is do it. If not, see linearization etc will work. 
+4. Start implementing and looking into the possibility of LQR control on quate11rnions. First try to understand if it is possible. If it is do it. If not, see linearization etc will work. 
 5. Start preparing document for quals. Start lifting text from paper. Think of edits for the paper. 
 6. Prepare for reading group. 
 
@@ -524,11 +524,208 @@ MAY 8
 2. Read reading group paper 
 3. Compile thoughts for quals. Come up with an outline for presentation and paper for discussion with Brenna. 
 
+MAY 11 2017:
+
+1. Finish quals paper - DONE
+1b . Start presentation: Set it up TOMORROW MORNING
+1c. Look into more literature. For the macro slide. 
+2. Quats Data prep - DONE
+3. Finish Class Lecture Slides - Good idea now. 
+
+MAY 12-15 2017:
+
+1. Quals Presentation - DONe
+2. Quals Abstract - DONE
+3. Class Lecture Presentation - DONE
+
+MAy 16 2017
+
+1. Model Learning. Quaternion stuff. Other options? All of it together. Think about neural net differentiation. Under quaternions, check the math properly. 
+
+2. Start editing the paper for final RSS submission. Make notes on the reviews. 
+
+MAY 23 2017:
+
+1. Look at paper revisions, make substantial notes. Maybe start editing as well - DONE
+2. Work on model learning. Try out joint kinematics using linear models althought alex has a premonition that it won't work for anything beyond 2 joints - DONE
+3. Gather data from michael is possible. Start looking into this stuff no - NOT DONE
+
+May 24 2017:
+
+1. Get data for project from server. Lay out what needs to be done step by step after looking at the parse data
+2. Work with Alex on testing out the SAC system. 
+3. Start working on the revisions. 
+
+Meeting notes:
+
+1. Discuss paper revisions
+2. Ask about TAing. 
+3. 
 
 **********************************************************************************************************************
 **********************************************************************************************************************
 **********************************************************************************************************************
 **********************************************************************************************************************
+
+June 1st 2017:
+
+Brenna meeetings:
+
+1. Discuss about revisions and what went wrong with me and what my actionable steps are next.
+2. Continuation of development. For journal the work so far would be only first part. Second part should involve some extension. Todd's ideas? confidences as normalized pdfs eovolving in time according a dynamical system. 
+
+What thoughts on studies? How should it be different? A single modes switch alone is not working? Should we try automated mode switching? 
+
+Model validation studies. Game type scenarios? 
+
+3. Funding for travel to Minnesota - DONE
+4. Flipped times - dONE
+
+
+JUne 6th
+
+1. Ask about vouching for ME512
+2. Talk about Lance - Cost Center: 81394 - CPS Grant  - Orbitz, Kayak, Travelocity. 
+3. That's it.
+
+JUNE 12 2017
+
+1. Try out IRL packages on lab machine. See what is going on. 
+2. More reading. Understand Dorsa's paper and try to formulate mode switch assistance in similar terms. And note down the differences - DONE. 
+3. Book tickets to MN. 
+4. Prepare for meeting. 
+
+June 13 2017.
+
+1. Meeting Notes:
+	1. Do you want me to approach it in a formal way by trying to frame the problem within the context of optimal control and use techniques similar to what Todd would probably use to generate mode selection actions? If so, this requires major overhaul. 
+	2. Or is it that you just want to "brush" up the heuristic methods with some additional stuff, for example, modify the confidences as a DS, change the confidence function and how it is used within the blending framework, intepret it as pdf and compute entropy and use entropy as a disambiguating measure and add a full fledged modified study? (THis is not a significant contribution). If this is the case, I will finish up the DFT stuff in ROS. Basic confidence computation is done. Need to do the computed projections? Project forward in time for 6 different sceanrios, with different inputs. And use the same metric?
+
+ 	3. Start work on presentation/poster for RSS. July 5 is lab presentation. July 10 is last day for submission
+ 	4. Travel related 
+ 	5. Minnesota flights - Kayak vs. System. 
+
+
+
+******************START PREPPING FOR SUMMER SCHOOL*********************
+
+ June 15 2017
+1. Read on IT in DS. IT (2 papers?)
+	a. Read on Fisher information. Tutorial. Also, why doesn't entropy not make sense for continuous random vairbales?!!
+
+2. Read a couple of papers on brain stuff. Check out Neuron issue
+3. Make copious amounts of notes. Start scribbling some math down?
+
+June 16 2017:
+
+1. Do review. 
+2. Look into Joseph Lizier's work. Download springer book on Introduction to Transfer Entropy
+3. Work with Mahdieh briefly!
+
+June 19 2017:
+
+Had meeting with BRenna
+
+1. Few ideas for measurement model for confidences. Where does the uncertainity come from? Its in the formulation itself. Sample a bunch of different formulations and create a distribution. 
+2. Use a super small sigma for the noise. 
+3. Use the numbers from 6 different dimensions as a doistribution (least likely way?)
+
+Somehow turn a single number into a distrribution? Are confidences the way to go? Are there other metrics?
+
+June 20 2017:
+
+1. Look into discrete parameter Fisher Metric. Identify "where" exactly is the uncertainity in our "virtual sensor". 
+
+
+June 26 2017:
+
+1. Add stuff into presentation. Think of video suggestion. (After workout)
+2. Try to finish up poster. (After workout)
+3. Understand what is the discrete equivalent of Fisher information. Start writing it up. 
+4. Talk to Mahdieh about HRI work. 
+5. Start looking into COSMO preparation. Start looking at old COSMO lectures. 
+
+17 for RAL
+9 for ICORR 2014
+
+July 5
+
+1. TA stuff - Prep
+2. Poster and Presentation done by the weekend
+3. Talk to Todd about this?
+4. RSS. Talk with Neikum. Prepare regarding POMDPs and approaches using that. 
+
+July 6
+
+1. Work on poster. Finish it. 
+2. print tickets. 
+
+Pick hardswarre stuff. 
+
+
+Intepret the meaning of FIsher information in the context of continuous parameter space. Can I come up with something that cpatures something similar, based on pointwise estimates, 
+**********************************
+**********************************
+**********************************
+**********************************
+**********************************
+**********************************
+
+POST RSS
+
+July 19:
+
+1. Read Konrad book- 2nd chapter (DONE). Read neuroscience papers. Look at slides. 
+2. Work out the Fisher info math stuff (DONE). Try to document. Try out basic stuff in simulation - Some thoughts on the pdf structure of confidence. Maybe using beta distrbution. 
+Fisher information for beta distribution needs to be computed. How to still compute Fisher for discrete parameters. 
+3. Read HII book, 2nd chapter - Almost. Might be getting irrelevant. 
+4. IRB stuff with lab - Not sure?
+
+July 20:
+
+1. Read the slides from Schracter (DONE).  Some coding (Spiking neurons etc) (SOME);
+2. Do math for Fisher. Document it maybe? Look into fisher information for non gaussian distributions, such as beta. DONE
+3. Finish Chapter 3 (Reading). Read about lesion modeling. 
+4. Online classes - COmputational Neuro (Tonight) (NOT)
+5. read Demis Hassabis papers (Train) HALF DONE
+
+July 21:
+
+1. Write code generate Beta Distribution for given mode and variance. Transformation  (done)
+2. Do online CompNeuro. Read COSMO papers. 
+3. Maybe read more about information theory related stuff?
+
+Brenna meeting:
+1. POMDP workshop. UCBerkeley status for info gathering. Risk senstive RL. Talked to Khansari. What are your thoughts?
+
+2. Reimbursements?
+
+July 23
+
+1. Email Hanna and Agha Ali for POMDP slides - 
+2. Read more on comp neuroscience. More Coursera. Maybe do some coding related to it? RReferesh math for the summer school - DONE
+3. Buy notebooks, pens etc for summer school. 
+4. Read Brenna's class notes and PR book to consolidate Filtering concepts. 
+
+July 25
+
+1. Coursera Comp Neuro. Finish Tenenbaum. 
+2. Riemannian manifold. Finish tutorials. Read papers. Understand TPGMM. Maybe process PoseData files for riepybdlib. 
+3. Maybe start again on Mode Switching for Maximal Intent Inference using Fisher Information
+4. Work with Sid on comp setup.
+
+July 26
+
+1. Work on symbolic math. Convert the formulation into code. 
+2. Start working on Todd document. 
+3. Comp NS coursera. Finish Tenenbaum. Review feedback systems notes, review Brenna notes. 
+
+July 27:
+
+1. Work on symbolic implementatoin of FI. Consider an alternate model in which the virtual sensor reads out the entropy of the confidence distribution. If so identify what is the unknown parameter properly. 
+
+What does it mean to "Maximize" EID? What is the underlying meaning Todd's work? When OCt is to generate x(t) in order to maximze EID along the trajectory, in essence they are trying to "maximize" the amount of information gained wrt the unknown param (the goal position) from the measurement. 
+
 
 
 GENERAL:	4-5 videos of PGM and 4-5 pages of PGM textbooks

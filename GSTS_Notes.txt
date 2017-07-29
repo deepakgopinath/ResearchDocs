@@ -1,0 +1,48 @@
+GSTS
+
+Provide an overview on your academic/research progress to date.
+Review your goals for the current academic year and summarize your progress towards meeting those goals. Outline accomplishments in research, courses, leadership, entrepreneurship and community service, etc.
+Please limit your response to 250 words or less.
+
+Completed all the course requirements for my program and the research qualification exam in the past year. 
+ 
+Developed a system for mode switch assistance that would maximize human intent disambiguation and published in RSS 2017. 
+
+Presented my work on Human-in-the-loop Optimization of Shared Autonomy in Assistive Robotics at CASE in August 2016. 
+
+Workshop submission at Midwest Robotics Workshop 2017. 
+
+Worked on the development a potential field based reactive controller for the arm and developed the code base such that it could be easily integrated into any project. 
+
+Was also accepted into COSMO summer school in August. 
+
+Future goals:
+	1.  I will also be investigating into a Fisher Information based disambiguation metric and improve the current system. A full fledged study with SCI subjects will also be performed. The plan is to convert the conference paper into a journal paper.
+	2. The human intent disambiguation scheme work is also the departure point for a framework that would cast human-robot interaction in information-theoretic terms. In the coming year, I hope to identify the theme for thesis proposal (as this is due in Summer 2018) and plan to submit a paper (possibly conference), which would outline the basic elements of information theoretic formulations of HRI. 
+	3. I would complete my teaching requirements this coming year.
+	4. I am also hoping to be part of collaborative projects with other members in the lab related to model learning and user preference modeling. 
+
+Please rate yourself and provide a brief justification.
+Effectiveness in Communication with Advisor
+Please rate yourself and provide a brief justification.	
+Rating Scale: 5-excellent, 4- very good, 3- average, 2- needs improvement, 1- poor
+
+Work Ethic
+Please rate yourself and provide a brief justification.
+Rating Scale: 5-excellent, 4- very good, 3- average, 2- needs improvement, 1- poor
+
+Collaborative Teamwork
+Please rate yourself and provide a brief justification.
+Rating Scale: 5-excellent, 4- very good, 3- average, 2- needs improvement, 1- poor	
+
+
+
+Goals for Academic/Research Progress for Upcoming Year
+Provide a brief narrative outlining your academic and research goals for the upcoming academic year.
+
+
+Comments on Experience
+Please comment on your positive experience during the last year. Discuss any difficulties encountered in the PhD program and any extra help that could be provided. 
+
+Research Topic
+Provide a brief overview (or title) of your current research topic.
