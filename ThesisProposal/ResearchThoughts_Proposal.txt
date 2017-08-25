@@ -21,5 +21,15 @@ Explore ways in which two RNNs or a network of RNNs can "transfer information" v
 Does this sound like different regions of the brain interconnected?!! 
 
 
+
+
 https://www.mis.mpg.de/ay/index.html?c=projects/embodiedai/embodiedai.shtml
 http://homepages.herts.ac.uk/~comqdp1/#itiip -  Daniel Polani
+
+
+Post COSMO ideas:
+
+Decision making models implemented in robots. Deciding when to assist in assistive robots? Bayesian DDM models for decision making in assistive robots?
+
+How does relational structures in the task space influence and inform human's action plan for robot control?
+

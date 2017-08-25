@@ -35,3 +35,9 @@ WHAT, WHEN AND HOW OF ASSISTANCE IN ROBOTIC MANIPULATION?
 IDENTIFYING WHEN TO INTERFERE. Based on the injury there might some difficulty in getting the task done. which the subjects may not mind. However, in certain situations, the impact of the injury would be too much that there would be no way out but to seek assistance. It might be that even uninjured subjects may have issues in those kinds of situations. yoshikawa manipuliability index was thought of as a measure to determine whether the user is in troublesome spots. Close to being singularit, however, needs not directly correlate to cognitive difficulty in controlling. For example, at the edges of the workspace, the robot might be close to singularity. However, from a cognitive perspective there is nothing confusing about this scenario. That is, the user might be able to figure out quickly that the "limits" have reached and that s/he needs to move away from. However, if the robot arm gets all crooked due to "bad"/poor planning decision made earlier, then it might be hard to get out of that situations. Being in crooked positions is different from being clos to singularity. What metric(index?) would capture the crookedness of a configuration. 
 
 How often does a robotic arm get into such crooked positions due to poor control planning/scheduling from the user? If it hardly happens, then the approach would never be used for naything. 
+
+
+INTENT INFERENCE:
+
+The robot gets to see "data" coming from the humans. The robot has a hypothesis space regarding what the underlying intent is. Can the robot use a) previously seen examples b) heuristics etc to constrain this hypothesis space so that the intent inference becomes tractable? How can the intent inference part be rich enough to capture level object level, grasp level, task level (what stage of the multistage task) hypothesis? Is the hypothesis space itself changing with the arrival of new data? 
+

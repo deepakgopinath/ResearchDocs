@@ -468,4 +468,25 @@ p_i & \hspace{5mm} for ~~ \boldsymbol{x_g} = \boldsymbol{x_{g_i}} \\
 \end{array}\right. 
 \end{align*}
 such that $\sum_{i=1}^{n_g} p_i = 1$
+
+\subsection*{Information flow and evidence accumulation}
+
+Human decision making has been modeled as evidence accumulation reaching different threshold which makes the animal commit to a choice. Drift Diffusion Models (DDM) have been successful in predicting the reaction times and accuracy in a binary choice setting. 
+Can DDM type models be implemented in robots to help decide when to act optimally? Furthermore is there is a link between evidence accumulation and information transfer?
+
+Sequential Probability Ratio Test is a method of using sequential incoming data for hypothesis testing. This is closely tied to the idea of evidence accumulation. The decision maker is trying to make a binary decision (this is akin to hypothesis testing) and new pieces of evidence arrive at every time point (akin to sequential data samples). 
+
+The question of ``when'' an assistive robot should be helping is still an open question. In blending based paradigms, typically the robot is helping at all times? In mode-switching schemes, ML techniques have been used to mimic how humans switch modes. 
+
+Can evidence accumulation, FI based ideas etc helping in modeling of how an assistive agent (human or robot) provides optimal assistance to a motor impaired subject? 
+
+Is recursive belief updating equivalent to Drift Diffusion models? Look into the equivalence between Bayesian inference and Drift Diffusion stuff? 
+
+\section*{Thesis Ideas}
+
+1. When, What and How of assistive robotics? 
+
+\noindent2. Understanding HRI in terms of information theoretic ideas. 
+
+\noindent3. Understanding how humans operate assistive robots and how do they utilize structure in the environment to guide their actions. 
 \end{document}

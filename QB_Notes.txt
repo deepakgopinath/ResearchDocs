@@ -1,0 +1,20 @@
+QB_Notes
+
+QBInterface is a super class for QBHand and QBCube. 
+
+QB_Interface_Node:
+
+QB_Class initializes and activates the 6 cubes and the 1 hand, however, by itself does not launch any controllers. 
+
+qb_interaction listens to values written to topics on /qb_control/robot_ref (using rqt reconfigure) and "sends it" to the cubes. 
+
+qb_control.cpp
+
+listens to /qb_control/robot_pose_ref - referenceCallback
+
+
+qb_control.cpp has a spin() which is always running. This is the block of code which implemnts the FFDC, PID etc....This block of code constantly monitors the qref and qref_RL and makes sure that the current position matches the reference. 
+
+qb_controller_manager uses ROS's controller interface to build a wrapper around the qb_control class. The read() and write() function in qb_controller_manager essentially uses the get and set services from the qb_control class respectively. 
+
+Week of Sept 8-18: Attending FSR. 

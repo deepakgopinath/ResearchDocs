@@ -2804,3 +2804,56 @@ The robots need to have a good idea of what the humans want before it can step i
 Do people have expectations (priors) over how different robots work? How does all of that factor into the way they operate a robot? 
 
 how do humans acquire knowledge about the kind of assistance robots are offering them and how will that affect the way they choose to operate the robot during a task. 
+
+*****************************POST COSMO THOUGHTs*******************************8
+
+When to make asstsive options: Accumulation of evidence in favor of humans needs help?!?! DDT?
+Drift diffusion is developed for two options. 
+
+Confidence evolution as drift diffusion. 
+
+For multiple goals, can we use drift difusion models, if we decompose the problem of multiple goals into multiple binary models. ?
+
+look into Fisher information formulation such that the "sensor" used measure the entropy in confidences directly. REad Todd's document once again identify what the issues were. Generalize the formalism to 3 dimensoins. 
+
+Robots need to make optimal decisions in the context of assistive robotics to ensure that the assistance provided is useful and seamless. Optimality involves multiple aspects such as what kind of assistance is to be provided, when should the assistance be provided and how much assistance is required. Does this imply that it is important for robots to have models of how humans act? And then use similar models to make optimal decisions? 
+
+What does it mean to have a theory of human robot interaction in the context of assitive robotics? 
+
+https://link.springer.com/chapter/10.1007%2F978-3-642-25691-2_9
+
+Is it important for the robot to have a model for humans act in a given situation? Can a simple state to action mapping explain how humans decide to act (control an assistive robot). How does human utilize hierachical structure in the spatial relationship between objects to plan a movement plan for the robot and how is that affected by the control interface used. 
+
+The notion of a leaky integrator controlling when an assistive robot should help might work. that is, the robot waits until it has enough evidence (regarding how bad the situation is for the human) before it decides to step in and help. 
+
+
+Think of a human caretaker helping a subject in mode switching. The caretaker gets to observe what the human is doing and make his/her own judgment regarding when to make the mode switches. 
+
+What aspects of the subjects behavior (how he controls the robot), would have caused the human to make the mode switch? Are these the same aspects that an assistive robot should be paying attention to? Would this give us insight into the important features that the assistive robot should be paying attention to and relying on to make mode switch related assistance. 
+In order to truly understand how people perform mode switches, blending should be out of the picture, because the blending will affect the subject's " natural" plans. 
+
+Are human caretakers the best at picking up "signals of need" and inferring what the human wants? If so, then there might be some merit in building models of how human caretakers function! What kind of hierarchical information structure is utilized by human caretakers when providing help. 
+
+Is it meaningful to observe therapists, in that case?
+
+
+
+The Fisher Information formulation of Disambiguation Metric is having its issues. 
+Formulation 1:
+
+In which the confidences were directly taken as the sensor measurements and the unknown parameter was taken to the "intended goal". The math was correct was correct but useless when it comes to disambiguation. This formulation was very close to how Miller et al. used it. Instead of "electric field" sensors, I happened to have confidence sensors. However, the EID tries to capture the effect of an uh that will maximize the confidence measurements for ALL the goals, instead of one or the other. This is just the opposite of disambiguation. Therefore we needed something that directly captures the concentration of confidences around a single goal (whichever it is). 
+
+Formulation 2:
+
+In which the entropy of the confidence distribution was taken as the `virtual sensor' measurement. This seems to be a good choice for disambiguation purposes. However, it is unclear what the unknonw parameter is. For a given robot position, goal position and u_h the entropy is given. FI metrics can't be applied unless there is a clear notion of what is unknown?! I have an implementation in whcih the FI is cpmputed by taking derivative with respect to the robot position. The simulation results are meaningless and rightly so!
+
+Formulation 3:
+
+Think of an alternate space in which this problem is solved. The "graph paper" used for this formulation is the space of u_h. Consider the 2D problem!
+
+Side note: Can Miller et al.s work be generalized to multiple objects. If so, the solution of the optimal control problem will be a sensor trajectory that will result in higher measurements for "all the goals" in the scene. Miller et al. maintains a prior over the goal positions which gets updtaed iterativelt using Bayesian filtering, And in turn uses this quantity while computing the EID. With time, the prior over goals become more peaked. What if we keep the prior to be uninformed? Does it make a difference to the rest of the formulation? Probably not. 
+
+Formulation 3 seems to be the most promising of all. There are some numerical issues that still persist (divide by 0 issues). However preliminary simulation results looks fairly decent and promising. 
+
+
+

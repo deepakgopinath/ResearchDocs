@@ -727,6 +727,46 @@ July 27:
 What does it mean to "Maximize" EID? What is the underlying meaning Todd's work? When OCt is to generate x(t) in order to maximze EID along the trajectory, in essence they are trying to "maximize" the amount of information gained wrt the unknown param (the goal position) from the measurement. 
 
 
+******************POST COSMO******************8
+
+
+1. Finish CPS grant - DONE
+2. Do IEEE TAM review - ONe pass done.
+http://eprints.uwe.ac.uk/29151/1/Geravand-2016-SORO.pdf
+
+
+
+********************************************************
+
+August 18 2017
+
+Brenna meeting:
+
+1. CPS Grant
+2. Grader clarifications
+3. Summer school summary
+4. Fisher info - Todd document...
+5. Review
+
+
+August 22 2017:
+
+1. MAtlab Symbolic entropy FI - Have an implementation. The FI metric is meaningless, which is why it doesn't make much sense. 
+2. Study QB Arm code more - A little bit more. 
+3. Do paper review. One more pass. 
+4. Read more!!!!
+
+
+Aug 23 2017:
+
+Meeting notes:
+
+Set 8-19 Brenna gone to CMU/FSR
+Sept last week -IROS - Brenna gone. 
+
+1. Discuss QBArm projects 
+2. Discuss GSTS
+3. Discuss FI issues. 
 
 GENERAL:	4-5 videos of PGM and 4-5 pages of PGM textbooks
 			4-5 videos of DL and 4-5 pages of DL textbook. Also implement and read code. Undertsand tf and keras
@@ -750,4 +790,9 @@ PReparation for Summer School:
 1. Review of Calculus, Linear Algebra, Probability, Stats
 2. Reading Cognitive Neuroscience. 
 3. Diong Deep Learning, CV, Comp NeuroScience class on Coursera. 
+
+
+Perceptual Decision Making:
+
+Jan Drugowitsch
 
