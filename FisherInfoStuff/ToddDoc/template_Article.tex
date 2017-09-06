@@ -472,16 +472,234 @@
 %such that $\sum_{i=1}^{n_g} p_i = 1$
 
 
+%
+%\section*{Identification of control modes that maximizes goal disambiguation using Fisher Information}
+%
+%\textbf{Context}: The subject performs reaching tasks using an assistive robotic manipulator. The set of discrete goals is denoted by $\mathcal{G}$ with $n = |\mathcal{G}|$. Our aim is to identify those control dimensions/modes that will help the robot to disambiguate between the different goals and thereby help the robot perform better intent inference. 
+%
+%\noindent \textbf{Intent inference}: In order for the assistive robot to provide the right kind of assistance, it needs to have a good idea of what the user's underlying intentions are; or in other words, the robot needs to know which one of the $n$ discrete goals is the user's intended goal. Furthermore, we assume that there is one and only one intended goal and is denoted by $g^*$.
+%
+%\noindent \textbf{Intent estimation}: Intent inference essentially boils down to estimating $P(g|\boldsymbol{u_h}, \boldsymbol{x_r})$. The problem can be formally described in terms of POMDPs, in which a prior over goals and likelihood of user actions can be assumed. Bayesian inference techniques can be used to estimate the posterior distribution over goals to estimate $P(g|\boldsymbol{u_h}, \boldsymbol{x_r})$. 
+%\begin{equation*}
+% P(g|\boldsymbol{u_h}, \boldsymbol{x_r}) = \eta P(\boldsymbol{u_h} | g, \boldsymbol{x_r})P(g)
+%\end{equation*}
+%where $\eta$ is a normalization factor. 
+%
+%Alternately, we could rely on heuristic methods based on \textit{confidence functions} to estimate intent. Different types of confidence functions can be used. One choice of confidence function is a ``directedness'' based confidence function which measures the directedness of the user's control command towards a particular goal location. The higher the confidence associated with a goal, the more the system is confident that the goal is indeed the user's intended goal. 
+%Confidence functions can be interpreted as a ``proxy'' for $P(g|\boldsymbol{u_h}, \boldsymbol{x_r})$. 
+%
+%Another interpretation of a confidence function is that it is like a ``virtual sensor'' whose measurements contain information regarding the user's intended goal.
+%
+%\noindent \textbf{Control dimensions/modes}: Due to the dimensionality mismatch between the robotic device and the control device used to control these devices, the entire control space is partitioned into smaller subsets called \textit{control modes}. 
+%
+%In the most restricted cases (head arrays and sip n' puffs) the control modes correspond to the control dimensions themselves (1D interfaces). In such cases, the modes can be characterized by the control commands that can be generated along the corresponding control dimension. 
+%
+%\noindent\textbf{Maximizing goal disambiguation}: Given a particular form of intent estimation technique (Bayesian or confidence functions), certain control commands (or equivalently control dimensions) issued \textit{by} the human will be \textit{more} useful \textit{for} the robot in performing goal disambiguation and therefore inferring the human's intended goal. Our aim is to develop a metric that will estimate the ``goodness'' of being in a control dimension (and as a result of issuing control commands along those control dimensions). 
+%
+%In our RSS 2017 work, we formulate a disambiguation metric that characterizes the disambiguation capability of each control dimension/mode. A mode switch assistance scheme is developed utilizing this metric in which the control mode with maximum disambiguation capability is chosen \textit{for} the human upon assistance request. The hypothesis is that subsequent operation of the robot in the optimal control mode with ``help'' the robot to perform better intent inference and will result in appropriate kinds of assistance behavior which will in turn improve task related performance. 
+%
+%\noindent \textbf{Fisher Information for characterizing control modes}: The disambiguation metric developed in our previous work was completely ad hoc and heuristic. We hope to rely on more theoretically sound measures to characterize the disambiguation capability of a control mode. To this end, we rely on the Fisher Information metric. 
+%
+%Fisher information quantifies the ability of a random variable (in this case the confidence measure) to estimate an unknown parameter (which is the position of the intended goal). This idea is directly related to the approach taken by Silverman et al. and Miller et al., in which Fisher Information is used within the context of optimal control for information acquisition. In their work, the expected value of the Fisher Information with respect to the probability density function of the unknown parameter is computed (the positions of the intended goal) and is known as the \textit{Expected Information Density} (EID). In our work we use EID to characterize the ``information content'' contained in a control mode  in estimating the unknown parameter. 
+%
+%\noindent\textbf{Scenario}: We will restrict to a 2D reaching task for the sake of illustration. 
+%
+%\noindent The robot is a 2D robot that can perform reaching tasks. The control interface has 2 modes: corresponding to the $x$ and $y$ dimensions. The user can initiate motion along any dimension (one at a time). There are $n$ discrete goals in the scene. 
+%
+%\noindent The set of goals are characterized by their position in space and is denoted by
+%
+%\noindent$\{\boldsymbol{x_{g_1}},\boldsymbol{x_{g_2}},\dots, \boldsymbol{x_{g_n}}\}$.
+%Let $\boldsymbol{x_r}$ denote the end-effector position with respect to the world frame and $\boldsymbol{u_h}$ denote the user control command.  Let $c_g$ denote the confidence measure associated with a goal $g$. We can interpret this confidence measure as a sensor reading. 
+%
+%\noindent Aim: Given all the goal locations, the prior distribution over goals and the robot position what we are interested in the \textit{expected information density} of a control dimension. That is, how much information can be gained by moving in a particular control dimension regarding the location of the intended goal ($\boldsymbol{x_{g^*}}$). 
+%
+%\noindent\textbf{Mathematical Formalism}:
+%The unknown parameter that we are trying to estimate is the location of the intended goal denoted by $\boldsymbol{x_{g^*}}$.
+%The ``measurement'' model for the confidence ``sensor'' that captures the confidence of the intended goal, $g^*$, is given by 
+%\begin{equation*}
+%	c_{g^*} = \Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2) 
+%\end{equation*}
+%We assume that our measurement model is stochastic. The noise is modeled as a zero-mean Gaussian distribution with a predefined variance. (Note that since this sensor is purely a mathematical construct and therefore the variance is artificially introduced into the picture by the system designer). Assuming a ``directedness'' based confidence formulation we have
+%\begin{equation*}
+%\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) = \frac{1+cos(\theta)}{2} ~~~  \in [0,1]
+%%\frac{4cos(\theta)}{1 - cos^2(\theta)}, ~~~\mu_{c_g} \in [-\infty, \infty]
+%\end{equation*}
+%where 
+%\begin{equation*}
+%cos(\theta) = \frac{\boldsymbol{u_h}\cdot(\boldsymbol{x_{g^*}} - \boldsymbol{x_r})}{\norm{\boldsymbol{u_h}}\cdot\norm{\boldsymbol{x_{g^*}} - \boldsymbol{x_r}}}
+%\end{equation*}
+%The unknown parameter is the location of the intended goal $g^*$ and this could be any one of the $n$ goals from the set $\mathcal{G}$.
+%
+%Since $c_{g^*}$ is distributed as a Gaussian random variable (by definition), the Fisher information (the amount of information a ``measurement'' has regarding $\boldsymbol{x_{g^*}}$) is given by
+%%\begin{equation*}
+%%\mathcal{I}(\boldsymbol{x_g}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \left(\frac{\partial\Upsilon(\boldsymbol{x_g}, \boldsymbol{u_h}, \boldsymbol{x_r})}{\partial \boldsymbol{x_g}}\cdot\frac{1}{\sigma}\right)^2
+%%\end{equation*}
+%
+%\begin{equation*}
+%\mathcal{I}_{i,j}(\boldsymbol{x_{g^*}}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}
+%\end{equation*}
+%Since $\boldsymbol{x_{g^*}}$ is a 2D parameter, the Fisher Information is a 2 by 2 matrix and not a scalar.
+%\noindent Since the intended goal could be any one of the goals from $\mathcal{G}$ we take expectation over $\boldsymbol{x_{g^*}}$. Therefore, 
+%\begin{equation*}
+%\Phi_{i,j}(\boldsymbol{u_h}, \boldsymbol{x_r}) =
+%\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i
+%\end{equation*}
+%The priors over the goals are only defined at discrete points in the domain, since the goal locations themselves are discrete. Therefore, 
+%\begin{align*}
+%p(\boldsymbol{x_{g^*}}) = \left\{ 
+%\begin{array}{cc} 
+%p_i & \hspace{5mm} for ~~ \boldsymbol{x_{g^*}} = \boldsymbol{x_{g_i}} \\
+%0 & \hspace{5mm} otherwise
+%\end{array}\right. 
+%\end{align*}
+%such that $\sum_{i=1}^{n} p_i = 1$.
+%
+%\noindent Marginalizing over $\boldsymbol{x_r}$
+%\begin{equation*}
+%\Phi_{i,j}(\boldsymbol{u_h}) = \int_{\boldsymbol{x_r}}\left[\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i\right]p(\boldsymbol{x_r})d\boldsymbol{x_r}
+%\end{equation*}
+%(The integral with respect to $\boldsymbol{x_r}$ is also a double integral, but is written vectorially due to space constraints.)
+%
+%We assume perfect knowledge of where the robot is. Therefore
+%the probability density function for $\boldsymbol{x_r}$ is given by
+%\begin{align*}
+%p(\boldsymbol{x_r}) = \left\{ 
+%\begin{array}{cc} 
+%1 & \hspace{5mm} \boldsymbol{x_r}=\boldsymbol{x_{true}} \\
+%0 & \hspace{5mm} otherwise
+%\end{array}\right. 
+%\end{align*}
+%
+%Therefore $\Phi_{i,j}(\boldsymbol{u_h})$ reduces to 
+%\begin{equation*}
+%\Phi_{i,j}(\boldsymbol{u_h}) = \left.\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i\right\vert_{\boldsymbol{x_r} = \boldsymbol{x_{true}}}
+%\end{equation*}
+%
+%The EID for $\boldsymbol{u_h}$ is then computed as 
+%\begin{equation*}
+%	EID(\boldsymbol{u_h}) = \text{det}(\bar{\Phi}(\boldsymbol{u_h}))
+%\end{equation*}
+%
+%The EID for control command along $x$ dimension can be computed by summing up $EID([1,0])$ and $EID([-1,0])$ and similarly for $y$ dimension can be computed by the summation of $EID([0,1])$ and $EID([0,-1])$.
+%
+%\subsubsection*{Simulation Results}
+%Simulations were done in MATLAB to understand what kind of information $\Phi(\boldsymbol{u_h})$ encoded. The number of goals were varied from 2 to 4. EID was calculated for $x$ and $y$ dimensions. 
+%
+%The EID was consistently higher for that control dimension which would result in an increase of confidences for \textbf{ALL} goals. The system does not know which is the user's intended goal. It assigns a probability for each one of the $n$ goals to be the intended goal (the prior). The EID is computed by taking the expectation over all possible intended goals. Higher EID will be for that control command (control dimension) which would result in a higher confidence regardless of which one of the $n$ goals the user chose as the intended goal. 
+%
+%However, this is not exactly what we are looking for as this is not goal disambiguation. In order for the system to be able to disambiguate it should be able to identify dimensions along with confidence related to the true intended goal rises and all other confidences get suppressed. 
+%
+%This is probably an issue with the choice of measurement model. Should the ``sensor'' be sensitive to absolute values of the confidence or the ``differences''? 
+%
+%\subsubsection*{Possible solutions and issues}
+%
+%Instead of using the confidence in the intended goal as the ``virtual sensor'' we could possibly use the negative of entropy of the confidence distribution as the sensor readings. By doing so, the control dimension which will maximize this quantity will have higher EID. I am still trying to work out the details for this now. 
+%
+%\textbf{Issues}: FIM requires the measurement model to be differentiable with respect to the unknown parameter which is the intended goal. If the ``virtual sensor'' is the negative entropy of the confidence distribution, it no longer is a function of the intended goal, but rather a function of the entire distribution. This will make the derivative ill-defined and subsequently we will not be able to evaluate the FIM. 
+%
+%\subsubsection*{Alternate idea}
+%
+%Can this problem be framed in a different way? What if the unknown parameter, is the control dimension which can disambiguate the most?
+%
+%Consider the discrete set of control commands along the different axis. For a full 6DOF problem, this would be 12 different control commands corresponding to positive and negative directions of a control dimension? 
+%
+%\subsection*{Math Formalism for Entropy Based approach}
+%
+%Instead of 
+%\begin{equation*}
+%c_{g^*} = \Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2) 
+%\end{equation*}
+%we can possibly have
+%\begin{equation*}
+%e = \Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2)
+%\end{equation*}
+%
+%where $\Upsilon$ is the entropy (negative of) of the confidence distribution and is a function of robot position and user control command. The goal positions are given and are treated as fixed parameters. 
+%Individual confidences are given as 
+%\begin{equation*}
+%c_{g^i} = \frac{1 + cos(\theta)}{2}
+%\end{equation*}
+%where 
+%\begin{equation*}
+%cos(\theta) = \frac{\boldsymbol{u_h}\cdot(\boldsymbol{x_{g^i}} - \boldsymbol{x_r})}{\norm{\boldsymbol{u_h}}\cdot\norm{\boldsymbol{x_{g^i}} - \boldsymbol{x_r}}}
+%\end{equation*}
+%Normalizing the confidences across the goals will result in a ``proxy'' probability distributions over goal confidences. 
+%\begin{equation*}
+%p(g^i) = \eta c_{g^i} ~~~,  \eta = \Sigma_{i = 1}^{n_g} c_{g^i}
+%\end{equation*}
+%$\eta$ is the normalization constant. 
+%
+%Entropy of this distribution over goals is defined as 
+%
+%\begin{equation*}
+%H(g) = -\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)]
+%\end{equation*}
+%and
+%\begin{equation*}
+%\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}) = -H(g) = -(-\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)])
+%\end{equation*}
+%
+%It can be seen that $H(g)$ is a function of $\boldsymbol{u_h}$ and $\boldsymbol{x_r}$ given the goal positions (treated as fixed parameters). Given a set of goals and the form of the confidence function, entropy is a scalar defined for each robot position and user control command. 
+%
+%I can possibly compute the Jacobian of $\Upsilon$ with respect to the robot position, however it will be different from how Murphey et al. conceives FIM. Murphey et al. has a clear notion of what is unknown (the goal position) and how some other variable (the sensor position) will help in knowing the unknown. (Fisher information is about how a sample of data contains information about an unknown parameter!)
+%
+%\noindent\textbf{Interpreting FI}:
+%\begin{equation*}
+%\mathcal{I}_{i,j}(\boldsymbol{x_{g^*}}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}
+%\end{equation*}
+%The above equation is the Fisher information when the measurement was the confidence itself (earlier case). How do we interpret this quantity? It is the rate of change of the ``measurement'' (the confidence in this case) upon infinitesimal changes in the intended goal's position (the unknown parameter).
+%
+%If this is the case, is it meaningful to have the ``measurement'' as the entropy of the confidence distribution and compute the derivative with respect to the robot position itself? For the given robot position $\boldsymbol{x_r}$, we want to be able to identify the $\boldsymbol{u_h}$ that will maximize the negative entropy of the confidence distributions, regardless of which one of the $n_g$ goals is the true intended goal. 
+%
+%\noindent\textbf{FI for Entropy Measurement}:
+%
+%Let $\boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}$ (the fixed parameters) be denoted as $\boldsymbol{\Theta}$
+%\begin{equation*}
+%\mathcal{I}_{i,j}(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h};\boldsymbol{\Theta})}{\partial x_r^ix_r^j}
+%\end{equation*}
+%\textbf{Note: This is FI measure is not quite meaningful because the derivative is taken with respect to an `known' parameter (the robot position). In Murphey et al.'s work, the FI is computed by taking the derivative with respect to the `unknown' parameter; the location of the goal and the measurement function is truly the measurement model of the sensor that is being used. In our case the ``virtual sensor'' is the entropy ``sensor''. Taking the derivative of the entropy measurement with respect to the robot position is quite arbitrary and is motivated by the need to marginalize out $\boldsymbol{x_r}$. }
+%
+%\noindent Marginalizing over $\boldsymbol{x_r}$
+%\begin{equation*}
+%\Phi_{i,j}(\boldsymbol{u_h};\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\int_{x_{r}^i}\int_{x_{r}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial x_{r}^ix_{r}^j}p(x_{r}^i, x_{r}^j)dx_{r}^jdx_{r}^i
+%\end{equation*}
+%
+%Since the robot position is known perfectly the above integral reduces to a single evaluation at $\boldsymbol{x_r} = \boldsymbol{x_{true}}$. 
+%
+%Therefore
+%\begin{equation*}
+%\Phi_{i,j}(\boldsymbol{u_h};\boldsymbol{\Theta}) = \left.\frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial x_{r}^ix_{r}^j}\right\vert_{\boldsymbol{x_r} = \boldsymbol{x_{true}}}
+%\end{equation*}
+%
+%The expected information density for $\boldsymbol{u_h}$ is then given as 
+%\begin{equation*}
+%EID(\boldsymbol{u_h}) = det(\bar{\Phi}(\boldsymbol{u_h};\boldsymbol{\Theta}))
+%\end{equation*}
+%
+%Entropy is a function of the given goal positions, robot position and the control commands. It does not matter which one of the $n_g$ goals is the true intended goal, the entropy is completely determined by $\boldsymbol{u_h}, \boldsymbol{x_r}$ and $\boldsymbol{x_{g}}'s$. Certain control commands will result in a higher entropy of the confidence distribution and certain others will result in a lower entropy for the same robot position and goal configurations. 
+%
+%Our goal is to use Fisher Information as a metric to capture the ``goodness'' of moving along a particular control dimension (equivalent to $\boldsymbol{u_h}$) in disambiguating BETWEEN the goals. The ``measurement'' model cannot just be the confidences, since FI will be higher for that $\boldsymbol{u_h}$ that will result in a higher confidences for ALL goals. If the measurement model is able to capture the distribution of confidences (negative entropy for example), the FI will be higher when the entropy is maximized (or is it?).
+%
+%\subsection*{Preliminary Results/Insights}
+%
+%I have an implementation of this newer idea and the results are not that promising. It might be because of the arbitrary decision to compute FI using derivative with respect to a known parameter which is the robot position. When using the entropy of the confidence distribution, it is unclear to me what is the unknown parameter. Is it the intended goal, is it the control command that will disambiguate the best? 
+
+\pagebreak
+%\subsection*{Yet Another Formulation!}
 
 \section*{Identification of control modes that maximizes goal disambiguation using Fisher Information}
 
-\textbf{Context}: The subject performs reaching tasks using an assistive robotic manipulator. The set of discrete goals is denoted by $\mathcal{G}$ with $n = |\mathcal{G}|$. Our aim is to identify those control dimensions/modes that will help the robot to disambiguate between the different goals and thereby help the robot perform better intent inference. 
+\textbf{Context}: The subject performs reaching tasks using an assistive robotic manipulator. The set of discrete goals is denoted by $\mathcal{G}$ with $n_g = |\mathcal{G}|$. Our aim is to identify those control dimensions/modes that will help the robot to disambiguate between the different goals and thereby help the robot perform better intent inference. 
 
-\noindent \textbf{Intent inference}: In order for the assistive robot to provide the right kind of assistance, it needs to have a good idea of what the user's underlying intentions are; or in other words, the robot needs to know which one of the $n$ discrete goals is the user's intended goal. Furthermore, we assume that there is one and only one intended goal and is denoted by $g^*$.
+\noindent \textbf{Intent inference}: In order for the assistive robot to provide the right kind of assistance, it needs to have a good idea of what the user's underlying intentions are; or in other words, the robot needs to know which one of the $n_g$ discrete goals is the user's intended goal. Furthermore, we assume that there is one and only one intended goal and is denoted by $g^*$.
+%
+%\textit{Recap: Going back to the problem addressed by Miller et al; the unknown parameter is the 2D spatial location of a goal. The ``sensor'' which measures the field potential can move around in the same space (space of 2D spatial location of a goal). Once the unknown parameter and the measurement model is defined, Fisher information can be used effectively to quantify the quality of a measurement in revealing the value of the unknown parameter.} 
+%
+%It is imperative that if FI metric is to be used for identifying control modes with maximum disambiguation, the unknown parameter and the measurement model have to be identified properly. The upcoming formulation treats the control commands themselves as the unknown parameter and the (negative) entropy of the confidence distribution is the sensor model. 
 
 \noindent \textbf{Intent estimation}: Intent inference essentially boils down to estimating $P(g|\boldsymbol{u_h}, \boldsymbol{x_r})$. The problem can be formally described in terms of POMDPs, in which a prior over goals and likelihood of user actions can be assumed. Bayesian inference techniques can be used to estimate the posterior distribution over goals to estimate $P(g|\boldsymbol{u_h}, \boldsymbol{x_r})$. 
 \begin{equation*}
- P(g|\boldsymbol{u_h}, \boldsymbol{x_r}) = \eta P(\boldsymbol{u_h} | g, \boldsymbol{x_r})P(g)
+P(g|\boldsymbol{u_h}, \boldsymbol{x_r}) = \eta P(\boldsymbol{u_h} | g, \boldsymbol{x_r})P(g)
 \end{equation*}
 where $\eta$ is a normalization factor. 
 
@@ -502,198 +720,9 @@ In our RSS 2017 work, we formulate a disambiguation metric that characterizes th
 
 Fisher information quantifies the ability of a random variable (in this case the confidence measure) to estimate an unknown parameter (which is the position of the intended goal). This idea is directly related to the approach taken by Silverman et al. and Miller et al., in which Fisher Information is used within the context of optimal control for information acquisition. In their work, the expected value of the Fisher Information with respect to the probability density function of the unknown parameter is computed (the positions of the intended goal) and is known as the \textit{Expected Information Density} (EID). In our work we use EID to characterize the ``information content'' contained in a control mode  in estimating the unknown parameter. 
 
-\noindent\textbf{Scenario}: We will restrict to a 2D reaching task for the sake of illustration. 
-
-\noindent The robot is a 2D robot that can perform reaching tasks. The control interface has 2 modes: corresponding to the $x$ and $y$ dimensions. The user can initiate motion along any dimension (one at a time). There are $n$ discrete goals in the scene. 
-
-\noindent The set of goals are characterized by their position in space and is denoted by
-
-\noindent$\{\boldsymbol{x_{g_1}},\boldsymbol{x_{g_2}},\dots, \boldsymbol{x_{g_n}}\}$.
-Let $\boldsymbol{x_r}$ denote the end-effector position with respect to the world frame and $\boldsymbol{u_h}$ denote the user control command.  Let $c_g$ denote the confidence measure associated with a goal $g$. We can interpret this confidence measure as a sensor reading. 
-
-\noindent Aim: Given all the goal locations, the prior distribution over goals and the robot position what we are interested in the \textit{expected information density} of a control dimension. That is, how much information can be gained by moving in a particular control dimension regarding the location of the intended goal ($\boldsymbol{x_{g^*}}$). 
-
-\noindent\textbf{Mathematical Formalism}:
-The unknown parameter that we are trying to estimate is the location of the intended goal denoted by $\boldsymbol{x_{g^*}}$.
-The ``measurement'' model for the confidence ``sensor'' that captures the confidence of the intended goal, $g^*$, is given by 
-\begin{equation*}
-	c_{g^*} = \Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2) 
-\end{equation*}
-We assume that our measurement model is stochastic. The noise is modeled as a zero-mean Gaussian distribution with a predefined variance. (Note that since this sensor is purely a mathematical construct and therefore the variance is artificially introduced into the picture by the system designer). Assuming a ``directedness'' based confidence formulation we have
-\begin{equation*}
-\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) = \frac{1+cos(\theta)}{2} ~~~  \in [0,1]
-%\frac{4cos(\theta)}{1 - cos^2(\theta)}, ~~~\mu_{c_g} \in [-\infty, \infty]
-\end{equation*}
-where 
-\begin{equation*}
-cos(\theta) = \frac{\boldsymbol{u_h}\cdot(\boldsymbol{x_{g^*}} - \boldsymbol{x_r})}{\norm{\boldsymbol{u_h}}\cdot\norm{\boldsymbol{x_{g^*}} - \boldsymbol{x_r}}}
-\end{equation*}
-The unknown parameter is the location of the intended goal $g^*$ and this could be any one of the $n$ goals from the set $\mathcal{G}$.
-
-Since $c_{g^*}$ is distributed as a Gaussian random variable (by definition), the Fisher information (the amount of information a ``measurement'' has regarding $\boldsymbol{x_{g^*}}$) is given by
-%\begin{equation*}
-%\mathcal{I}(\boldsymbol{x_g}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \left(\frac{\partial\Upsilon(\boldsymbol{x_g}, \boldsymbol{u_h}, \boldsymbol{x_r})}{\partial \boldsymbol{x_g}}\cdot\frac{1}{\sigma}\right)^2
-%\end{equation*}
-
-\begin{equation*}
-\mathcal{I}_{i,j}(\boldsymbol{x_{g^*}}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}
-\end{equation*}
-Since $\boldsymbol{x_{g^*}}$ is a 2D parameter, the Fisher Information is a 2 by 2 matrix and not a scalar.
-\noindent Since the intended goal could be any one of the goals from $\mathcal{G}$ we take expectation over $\boldsymbol{x_{g^*}}$. Therefore, 
-\begin{equation*}
-\Phi_{i,j}(\boldsymbol{u_h}, \boldsymbol{x_r}) =
-\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i
-\end{equation*}
-The priors over the goals are only defined at discrete points in the domain, since the goal locations themselves are discrete. Therefore, 
-\begin{align*}
-p(\boldsymbol{x_{g^*}}) = \left\{ 
-\begin{array}{cc} 
-p_i & \hspace{5mm} for ~~ \boldsymbol{x_{g^*}} = \boldsymbol{x_{g_i}} \\
-0 & \hspace{5mm} otherwise
-\end{array}\right. 
-\end{align*}
-such that $\sum_{i=1}^{n} p_i = 1$.
-
-\noindent Marginalizing over $\boldsymbol{x_r}$
-\begin{equation*}
-\Phi_{i,j}(\boldsymbol{u_h}) = \int_{\boldsymbol{x_r}}\left[\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i\right]p(\boldsymbol{x_r})d\boldsymbol{x_r}
-\end{equation*}
-(The integral with respect to $\boldsymbol{x_r}$ is also a double integral, but is written vectorially due to space constraints.)
-
-We assume perfect knowledge of where the robot is. Therefore
-the probability density function for $\boldsymbol{x_r}$ is given by
-\begin{align*}
-p(\boldsymbol{x_r}) = \left\{ 
-\begin{array}{cc} 
-1 & \hspace{5mm} \boldsymbol{x_r}=\boldsymbol{x_{true}} \\
-0 & \hspace{5mm} otherwise
-\end{array}\right. 
-\end{align*}
-
-Therefore $\Phi_{i,j}(\boldsymbol{u_h})$ reduces to 
-\begin{equation*}
-\Phi_{i,j}(\boldsymbol{u_h}) = \left.\frac{1}{\sigma^2}\int_{x_{g^*}^i}\int_{x_{g^*}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}p(x_{g^*}^i, x_{g^*}^j)dx_{g^*}^jdx_{g^*}^i\right\vert_{\boldsymbol{x_r} = \boldsymbol{x_{true}}}
-\end{equation*}
-
-The EID for $\boldsymbol{u_h}$ is then computed as 
-\begin{equation*}
-	EID(\boldsymbol{u_h}) = \text{det}(\bar{\Phi}(\boldsymbol{u_h}))
-\end{equation*}
-
-The EID for control command along $x$ dimension can be computed by summing up $EID([1,0])$ and $EID([-1,0])$ and similarly for $y$ dimension can be computed by the summation of $EID([0,1])$ and $EID([0,-1])$.
-
-\subsubsection*{Simulation Results}
-Simulations were done in MATLAB to understand what kind of information $\Phi(\boldsymbol{u_h})$ encoded. The number of goals were varied from 2 to 4. EID was calculated for $x$ and $y$ dimensions. 
-
-The EID was consistently higher for that control dimension which would result in an increase of confidences for \textbf{ALL} goals. The system does not know which is the user's intended goal. It assigns a probability for each one of the $n$ goals to be the intended goal (the prior). The EID is computed by taking the expectation over all possible intended goals. Higher EID will be for that control command (control dimension) which would result in a higher confidence regardless of which one of the $n$ goals the user chose as the intended goal. 
-
-However, this is not exactly what we are looking for as this is not goal disambiguation. In order for the system to be able to disambiguate it should be able to identify dimensions along with confidence related to the true intended goal rises and all other confidences get suppressed. 
-
-This is probably an issue with the choice of measurement model. Should the ``sensor'' be sensitive to absolute values of the confidence or the ``differences''? 
-
-\subsubsection*{Possible solutions and issues}
-
-Instead of using the confidence in the intended goal as the ``virtual sensor'' we could possibly use the negative of entropy of the confidence distribution as the sensor readings. By doing so, the control dimension which will maximize this quantity will have higher EID. I am still trying to work out the details for this now. 
-
-\textbf{Issues}: FIM requires the measurement model to be differentiable with respect to the unknown parameter which is the intended goal. If the ``virtual sensor'' is the negative entropy of the confidence distribution, it no longer is a function of the intended goal, but rather a function of the entire distribution. This will make the derivative ill-defined and subsequently we will not be able to evaluate the FIM. 
-
-\subsubsection*{Alternate idea}
-
-Can this problem be framed in a different way? What if the unknown parameter, is the control dimension which can disambiguate the most?
-
-Consider the discrete set of control commands along the different axis. For a full 6DOF problem, this would be 12 different control commands corresponding to positive and negative directions of a control dimension? 
-
-\subsection*{Math Formalism for Entropy Based approach}
-
-Instead of 
-\begin{equation*}
-c_{g^*} = \Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2) 
-\end{equation*}
-we can possibly have
-\begin{equation*}
-e = \Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2)
-\end{equation*}
-
-where $\Upsilon$ is the entropy (negative of) of the confidence distribution and is a function of robot position and user control command. The goal positions are given and are treated as fixed parameters. 
-Individual confidences are given as 
-\begin{equation*}
-c_{g^i} = \frac{1 + cos(\theta)}{2}
-\end{equation*}
-where 
-\begin{equation*}
-cos(\theta) = \frac{\boldsymbol{u_h}\cdot(\boldsymbol{x_{g^i}} - \boldsymbol{x_r})}{\norm{\boldsymbol{u_h}}\cdot\norm{\boldsymbol{x_{g^i}} - \boldsymbol{x_r}}}
-\end{equation*}
-Normalizing the confidences across the goals will result in a ``proxy'' probability distributions over goal confidences. 
-\begin{equation*}
-p(g^i) = \eta c_{g^i} ~~~,  \eta = \Sigma_{i = 1}^{n_g} c_{g^i}
-\end{equation*}
-$\eta$ is the normalization constant. 
-
-Entropy of this distribution over goals is defined as 
-
-\begin{equation*}
-H(g) = -\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)]
-\end{equation*}
-and
-\begin{equation*}
-\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}) = -H(g) = -(-\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)])
-\end{equation*}
-
-It can be seen that $H(g)$ is a function of $\boldsymbol{u_h}$ and $\boldsymbol{x_r}$ given the goal positions (treated as fixed parameters). Given a set of goals and the form of the confidence function, entropy is a scalar defined for each robot position and user control command. 
-
-I can possibly compute the Jacobian of $\Upsilon$ with respect to the robot position, however it will be different from how Murphey et al. conceives FIM. Murphey et al. has a clear notion of what is unknown (the goal position) and how some other variable (the sensor position) will help in knowing the unknown. (Fisher information is about how a sample of data contains information about an unknown parameter!)
-
-\noindent\textbf{Interpreting FI}:
-\begin{equation*}
-\mathcal{I}_{i,j}(\boldsymbol{x_{g^*}}, \boldsymbol{u_h}, \boldsymbol{x_r}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_{g^*}}, \boldsymbol{x_r}, \boldsymbol{u_h})}{\partial x_{g^*}^ix_{g^*}^j}
-\end{equation*}
-The above equation is the Fisher information when the measurement was the confidence itself (earlier case). How do we interpret this quantity? It is the rate of change of the ``measurement'' (the confidence in this case) upon infinitesimal changes in the intended goal's position (the unknown parameter).
-
-If this is the case, is it meaningful to have the ``measurement'' as the entropy of the confidence distribution and compute the derivative with respect to the robot position itself? For the given robot position $\boldsymbol{x_r}$, we want to be able to identify the $\boldsymbol{u_h}$ that will maximize the negative entropy of the confidence distributions, regardless of which one of the $n_g$ goals is the true intended goal. 
-
-\noindent\textbf{FI for Entropy Measurement}:
-
-Let $\boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}$ (the fixed parameters) be denoted as $\boldsymbol{\Theta}$
-\begin{equation*}
-\mathcal{I}_{i,j}(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h};\boldsymbol{\Theta})}{\partial x_r^ix_r^j}
-\end{equation*}
-\textbf{Note: This is FI measure is not quite meaningful because the derivative is taken with respect to an `known' parameter (the robot position). In Murphey et al.'s work, the FI is computed by taking the derivative with respect to the `unknown' parameter; the location of the goal and the measurement function is truly the measurement model of the sensor that is being used. In our case the ``virtual sensor'' is the entropy ``sensor''. Taking the derivative of the entropy measurement with respect to the robot position is quite arbitrary and is motivated by the need to marginalize out $\boldsymbol{x_r}$. }
-
-\noindent Marginalizing over $\boldsymbol{x_r}$
-\begin{equation*}
-\Phi_{i,j}(\boldsymbol{u_h};\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\int_{x_{r}^i}\int_{x_{r}^j}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial x_{r}^ix_{r}^j}p(x_{r}^i, x_{r}^j)dx_{r}^jdx_{r}^i
-\end{equation*}
-
-Since the robot position is known perfectly the above integral reduces to a single evaluation at $\boldsymbol{x_r} = \boldsymbol{x_{true}}$. 
-
-Therefore
-\begin{equation*}
-\Phi_{i,j}(\boldsymbol{u_h};\boldsymbol{\Theta}) = \left.\frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{x_r}, \boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial x_{r}^ix_{r}^j}\right\vert_{\boldsymbol{x_r} = \boldsymbol{x_{true}}}
-\end{equation*}
-
-The expected information density for $\boldsymbol{u_h}$ is then given as 
-\begin{equation*}
-EID(\boldsymbol{u_h}) = det(\bar{\Phi}(\boldsymbol{u_h};\boldsymbol{\Theta}))
-\end{equation*}
-
-Entropy is a function of the given goal positions, robot position and the control commands. It does not matter which one of the $n_g$ goals is the true intended goal, the entropy is completely determined by $\boldsymbol{u_h}, \boldsymbol{x_r}$ and $\boldsymbol{x_{g}}'s$. Certain control commands will result in a higher entropy of the confidence distribution and certain others will result in a lower entropy for the same robot position and goal configurations. 
-
-Our goal is to use Fisher Information as a metric to capture the ``goodness'' of moving along a particular control dimension (equivalent to $\boldsymbol{u_h}$) in disambiguating BETWEEN the goals. The ``measurement'' model cannot just be the confidences, since FI will be higher for that $\boldsymbol{u_h}$ that will result in a higher confidences for ALL goals. If the measurement model is able to capture the distribution of confidences (negative entropy for example), the FI will be higher when the entropy is maximized (or is it?).
-
-\subsection*{Preliminary Results/Insights}
-
-I have an implementation of this newer idea and the results are not that promising. It might be because of the arbitrary decision to compute FI using derivative with respect to a known parameter which is the robot position. When using the entropy of the confidence distribution, it is unclear to me what is the unknown parameter. Is it the intended goal, is it the control command that will disambiguate the best? 
-
-\pagebreak
-\subsection*{Yet Another Formulation!}
-
-\textit{Recap: Going back to the problem addressed by Miller et al; the unknown parameter is the 2D spatial location of a goal. The ``sensor'' which measures the field potential can move around in the same space (space of 2D spatial location of a goal). Once the unknown parameter and the measurement model is defined, Fisher information can be used effectively to quantify the quality of a measurement in revealing the value of the unknown parameter.} 
-
-It is imperative that if FI metric is to be used for identifying control modes with maximum disambiguation, the unknown parameter and the measurement model have to be identified properly. The upcoming formulation treats the control commands themselves as the unknown parameter and the (negative) entropy of the confidence distribution is the sensor model. 
-
 \subsubsection*{Casting the problem in the space of $\boldsymbol{u_h}$}
 
-We restrict ourselves to the 2D scenario for ease of illustration. For convenience, we can assume that the control interface is 1D and can only generate unit magnitude control commands. A single point in the 2D space of $\boldsymbol{u_h}$ corresponds to a specific control command issued by the human. All points on the unit circle in this space is the set of all points whose magnitude is 1. The intersection of the unit circle and the x-y axes denote set of control commands available in control mode 1 and 2 respectively. 
+We restrict ourselves to the 2D scenario for ease of illustration. For convenience, we can assume that the control interface is 1D and can only generate unit magnitude control commands. A single point in the 2D space of $\boldsymbol{u_h}$ corresponds to a specific control command issued by the human. All points on the unit circle in this space is the set of all points whose magnitude is 1. The intersection of the unit circle and the x-y axes denote set of control commands available in control mode 1 and 2 respectively. For the purposes of disambiguation, magnitude is irrelevant and therefore can be fixed at unity. 
 \begin{figure}[h]
 		\centering
 	\includegraphics[width = 0.7\hsize, height = 0.26\vsize]{./figures/UH_SPACE.png}
@@ -707,13 +736,13 @@ In some parts of the space, the sensor readings will peak and in others they wil
 
 \subsubsection*{Math Formalism}
 
-The entropy of the confidence distribution is the measurement model and can be written as, 
+The (negative of) entropy of the confidence distribution is the measurement model and can be written as, 
 
 \begin{equation*}
 e = \Upsilon(\boldsymbol{u_h}; \boldsymbol{x_r}, \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2)
 \end{equation*}
 
-Let $\boldsymbol{x_r}, \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}$ be denoted by $\boldsymbol{\Theta}$. The above equation then simplifies to 
+\noindent Let $\boldsymbol{x_r}, \boldsymbol{x_{g_1}},\dots,\boldsymbol{x_{g_n}}$ be denoted by $\boldsymbol{\Theta}$. The above equation then simplifies to 
 
 \begin{equation*}
 e = \Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta}) + \delta, ~~~ \delta \sim \mathcal{N}(0, \sigma^2)
@@ -721,7 +750,7 @@ e = \Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta}) + \delta, ~~~ \delta \sim \m
 
 
 where $\Upsilon$ is the entropy (negative of) of the confidence distribution and is a function of robot position and user control command. The robot and goal positions are treated as fixed parameters. 
-Individual confidences are given as 
+Using a directedness based confidence function, individual confidences are given as 
 \begin{equation*}
 c_{g^i} = \frac{1 + cos(\theta)}{2}
 \end{equation*}
@@ -729,20 +758,21 @@ where
 \begin{equation*}
 cos(\theta) = \frac{\boldsymbol{u_h}\cdot(\boldsymbol{x_{g^i}} - \boldsymbol{x_r})}{\norm{\boldsymbol{u_h}}\cdot\norm{\boldsymbol{x_{g^i}} - \boldsymbol{x_r}}}
 \end{equation*}
-Normalizing the confidences across the goals will result in a ``proxy'' probability distributions over goal confidences. 
+and $\theta$ is the angle between the control command vector and the vector joining the current robot position and the goal $g^i$.
+Normalizing the confidences across the goals will result in a ``proxy'' probability distributions over goal confidences. The probabilities are computed as
 \begin{equation*}
-p(g^i) = \eta c_{g^i} ~~~,  \eta = \Sigma_{i = 1}^{n_g} c_{g^i}
+P(g^i) = \eta c_{g^i} ,~~~  \eta = \Sigma_{i = 1}^{n_g} c_{g^i}
 \end{equation*}
 $\eta$ is the normalization constant. 
 
 Entropy of this distribution over goals is defined as 
 
 \begin{equation*}
-H(g) = -\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)]
+H(g) = -\Sigma_{i = 1}^{n_g}~P(g^i)~log[P(g^i)]
 \end{equation*}
 and
 \begin{equation*}
-\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta}) = -H(g) = -(-\Sigma_{i = 1}^{n_g}~p(g^i)~log[p(g^i)])
+\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta}) = -H(g) = -(-\Sigma_{i = 1}^{n_g}~P(g^i)~log[P(g^i)])
 \end{equation*}
 
 It can be seen that $H(g)$ is a function of $\boldsymbol{u_h}$, given the robot position and goal positions (treated as fixed parameters). Given a set of goals and the form of the confidence function, entropy is a scalar defined for each robot position and user control command. 
@@ -752,10 +782,10 @@ It can be seen that $H(g)$ is a function of $\boldsymbol{u_h}$, given the robot 
 \mathcal{I}_{i,j}(\boldsymbol{u_h}; \boldsymbol{\Theta}) = \frac{1}{\sigma^2}\frac{\partial^2\Upsilon(\boldsymbol{u_h};\boldsymbol{\Theta})}{\partial u_h^iu_h^j}
 \end{equation*}
 
-In order to compute the expected Fisher information density over different subspaces of the control command space we can compute the expectation of the above quantity over any subspace of interest $\mathcal{U}$. Each subspace (set of points) can correspond to a control mode. In the 2D case, with 1D control modes each mode contains two points; one corresponding to positive and negative unit magnitude control commands along the dimension of interest. 
+In order to compute the expected Fisher information density over different subspaces of the control command space we can compute the expectation of the above quantity over any subspace of interest $\mathcal{U}$. Each subspace (set of points) corresponds to a control mode. In the 2D case, with 1D control modes each mode contains two points; one corresponding to positive and negative unit magnitude control commands along the dimension of interest. 
 
 \begin{equation*}
-\Phi^{\mathcal{U}}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\int_{u_{h} \in \mathcal{U}}\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}p(\boldsymbol{u_h})d\boldsymbol{u_h}
+\Phi^{\mathcal{U}}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\int_{\boldsymbol{u_h} \in \mathcal{U}}\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}p(\boldsymbol{u_h})d\boldsymbol{u_h}
 \end{equation*}
 
 Note that the above integral is a multidimensional integral, but has been written using a ``vector'' notation for convenience sake. 
@@ -764,104 +794,150 @@ Note that the above integral is a multidimensional integral, but has been writte
 
 We will assume that only unit magnitude control commands are possible with the interface.
 
-\noindent Control mode 1 ($\mathcal{U}_1$) corresponds to the set $[\{1,0\}, \{-1,0\}]$ and control mode 2 ($\mathcal{U}_2$) corresponds to the set $[\{0,1\}, \{0,-1\}]$. 
+\noindent Control mode 1 ($\mathcal{U}_1$) corresponds to the set $[\{1,0,0\}, \{-1,0,0\}]$, control mode 2 ($\mathcal{U}_2$) corresponds to the set $[\{0,1,0\}, \{0,-1,0\}]$ and control mode 3 ($\mathcal{U}_3$) corresponds to the set $[\{0,0,1\}, \{0,0,-1\}]$.
+Let $p(\boldsymbol{u_h}) = 0.5$ for all $\boldsymbol{u_h}$. 
 
-\noindent Let $p(\{0,1\}) = p(\{0,-1\}) = p(\{1,0\}) = p(\{-1,0\}) = 0.5$. 
 
 %phi for U1 and phi for U2. EID for each. 
 \noindent Computation of $\Phi^{\mathcal{U}_1}_{i,j}$:
 \begin{equation*}
-\Phi^{\mathcal{U}_1}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\Big[^{}\left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{1,0\}}p(\{1,0\}) + \left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{-1,0\}}p(\{-1,0\})\Big]
+\Phi^{\mathcal{U}_1}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\Big[^{}\left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{1,0,0\}}p(\{1,0,0\}) + \left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{-1,0,0\}}p(\{-1,0,0\})\Big]
 \end{equation*}
 
 \noindent Computation of $\Phi^{\mathcal{U}_2}_{i,j}$:
 
 \begin{equation*}
-\Phi^{\mathcal{U}_2}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\Big[^{}\left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,1\}}p(\{0,1\}) + \left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,-1\}}p(\{0,-1\})\Big]
+\Phi^{\mathcal{U}_2}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\Big[^{}\left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,1,0\}}p(\{0,1,0\}) + \left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,-1,0\}}p(\{0,-1,0\})\Big]
 \end{equation*}
 
-EID of $\mathcal{U}_1$ can be computed as $\text{det}(\bar{\Phi}^{\mathcal{U}_1}(\boldsymbol{\Theta}))$ and EID of $\mathcal{U}_2$ as $\text{det}(\bar{\Phi}^{\mathcal{U}_2}(\boldsymbol{\Theta}))$ with $\boldsymbol{\Theta}$ to be the current robot position and the goal positions. 	
+\begin{equation*}
+\Phi^{\mathcal{U}_3}_{i,j}(\boldsymbol{\Theta}) = \frac{1}{\sigma^2}\Big[^{}\left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,0,1\}}p(\{0,0,1\}) + \left.\frac{\partial^2\Upsilon(\boldsymbol{u_h}; \boldsymbol{\Theta})}{\partial u_h^iu_h^j}\right\vert_{\boldsymbol{u_h} = \{0,0,-1\}}p(\{0,0,-1\})\Big]
+\end{equation*}
+The expected information density for each control mode can then be computed as 
+\begin{equation*}
+	EID(\mathcal{U}_n) = det(\bar{\Phi}^{\mathcal{U}_n}(\boldsymbol{\Theta}))
+\end{equation*}
+where $n \in [1,2,3]$ and $\bar{\Phi}$ refers to the 3 by 3 Fisher Information Matrix. 
+%EID of $\mathcal{U}_1$ can be computed as $\text{det}(\bar{\Phi}^{\mathcal{U}_1}(\boldsymbol{\Theta}))$ and EID of $\mathcal{U}_2$ as $\text{det}(\bar{\Phi}^{\mathcal{U}_2}(\boldsymbol{\Theta}))$ with $\boldsymbol{\Theta}$ to be the current robot position and the goal positions. 	
 
-If EID of $\mathcal{U}_1$ is greater than EID of $\mathcal{U}_2$ it implies that control mode 1 has greater disambiguation capability. 
+For example, if EID of $\mathcal{U}_1$ is greater than EID of $\mathcal{U}_2$ it implies that control mode 1 has greater disambiguation capability. 
 
 \subsubsection*{Preliminary insights and issues}
 
 This formulation seems to work the best compared to all others. There are certain numerical issues (divide by zero et cetera) that are problematic and are dealt with by making approximations to the control commands. The approximations do have an impact on the results, but they are minor I believe.  
 
-Following are some of the ``point cloud'' plots which depicts the best control mode for different points in the workspace. Control mode 1 (red) controls the X axis, and mode 2 (blue) controls the Y Axis. 
+Following are some of the ``point cloud'' plots which depicts the best control mode for different points in the workspace. Control mode 1 (red) controls the X axis, mode 2 (green) controls the Y axis and mode 3 (blue) controls the Z axis. The big black dots refer to the goal location in the 3D space. 
 
-\begin{figure}[h]
+
+
+
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.25\vsize]{./figures/X_Config.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%%	\label{DM_FIG}
+%\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Y_Config.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config1.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config2.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config3.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.25\vsize]{./figures/Config4.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config5.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config6.png}
+%	\vspace{-0.4cm}
+%	\caption{Disambiguating control modes.}
+%	%	\label{DM_FIG}
+%\end{figure}
+%%\begin{figure}[h!]
+%%	\centering
+%%	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config6.png}
+%%	\vspace{-0.4cm}
+%%	\caption{Disambiguating control modes.}
+%%	%	\label{DM_FIG}
+%%\end{figure}
+%
+
+
+
+
+\begin{figure}[H]
 	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.25\vsize]{./figures/X_Config.png}
+	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/3DConfig1.png}
 	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-%	\label{DM_FIG}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Y_Config.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
+	\caption{Disambiguating control modes - 3D}
 	%	\label{DM_FIG}
 \end{figure}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config1.png}
+	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/3DConfig2.png}
 	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
+	\caption{Disambiguating control modes - 3D}
 	%	\label{DM_FIG}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config2.png}
+	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/3DConfig3.png}
 	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
+	\caption{Disambiguating control modes - 3D}
 	%	\label{DM_FIG}
 \end{figure}
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.27\vsize]{./figures/Config3.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-	%	\label{DM_FIG}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.25\vsize]{./figures/Config4.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-	%	\label{DM_FIG}
-\end{figure}
+The results are intuitive and the algorithm is able to identify the mode with maximum disambiguation. For Figures 1 and 2 the goals are spread maximally along the $z$ dimension and therefore intuitively the control dimension with maximum disambiguation is $z$. The algorithm was able to identify $z$ as the best mode in much of the workspace. Note that the notion of disambiguation is not explicitly introduced in this formalism. Instead the quantity of interest is the negative entropy of the confidence distribution. The negative of entropy will be higher if the confidence distribution is `peakier' around a particular goal and lower if the distribution is close to uniform. Maximum disambiguation occurs when the distribution is focused around a particular goal or in other words when the negative of the entropy is maximized. 
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config5.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-	%	\label{DM_FIG}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config6.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-	%	\label{DM_FIG}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.6\hsize, height = 0.3\vsize]{./figures/Config7.png}
-	\vspace{-0.4cm}
-	\caption{Disambiguating control modes.}
-	%	\label{DM_FIG}
-\end{figure}
+Secondly, there are no simplifying assumptions made in this formalism. The disambiguation capability of a control mode is contained in the FI integral that is computed over the entire subspace that corresponds to a control mode. 
 
-\subsubsection*{Reflections}
-\textit{``...The Fisher Information $\mathcal{I}(\theta, x)$ can be thought of as the amount of information a measurement provides at location $x$ for a given estimate of $\theta$...''}
-
-\noindent\textit{``...Fisher information quantifies the ability of a random variable, in our case a measurement, to estimate an unknown parameter... }
-
-In the light of the above statements from Todd's papers, how justifiable is our approach! 
+An interactive GUI application has been made which lets the user move the robot around in 3D space and recompute the best disambiguating control mode repeatedly. The goal positions may also be resampled. 
+%\subsubsection*{Reflections}
+%\textit{``...The Fisher Information $\mathcal{I}(\theta, x)$ can be thought of as the amount of information a measurement provides at location $x$ for a given estimate of $\theta$...''}
+%
+%\noindent\textit{``...Fisher information quantifies the ability of a random variable, in our case a measurement, to estimate an unknown parameter... }
+%
+%In the light of the above statements from Todd's papers, how justifiable is our approach!
+%
+%Is $\boldsymbol{u_h}$ akin to the tangent space of robot and goal locations?!! 
+%
+%In Miller et al. both $\alpha$ and $x$ belong to the same space. However, in my case, $u_h$ and $x_r, x_g$ belong to different spaces (Is $u_h$ in the tangent space of the robot and goal positions?)
 \subsubsection*{References}
 1. Silverman, Y., L. M. Miller, M. A. MacIver, and T. D. Murphey, "Optimal Planning for Information Acquisition", IROS 2013, 2013. 
 

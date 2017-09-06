@@ -757,7 +757,7 @@ August 22 2017:
 4. Read more!!!!
 
 
-Aug 23 2017:
+Aug 23-25 2017:
 
 Meeting notes:
 
@@ -767,6 +767,24 @@ Sept last week -IROS - Brenna gone.
 1. Discuss QBArm projects 
 2. Discuss GSTS
 3. Discuss FI issues. 
+
+
+Aug 30 Meeting notes:
+
+1. Generalized into 3D
+2. Robotis assembly. 
+4. topology course. 
+5. clraify leave timeline.
+
+
+POMDPs write up - DONE
+Interactive Matlab WS sampler - DONE. 
+	Could be polished if needed. Add resample goals option. Add number of goals option in the interface. 
+
+Extending it to 2D interface - TODO
+Calinon stuff.  - TO DO
+
+Review!!!! FINISH IT! - DONE
 
 GENERAL:	4-5 videos of PGM and 4-5 pages of PGM textbooks
 			4-5 videos of DL and 4-5 pages of DL textbook. Also implement and read code. Undertsand tf and keras
@@ -796,3 +814,11 @@ Perceptual Decision Making:
 
 Jan Drugowitsch
 
+
+THESE TYPES OF DECICE?!!!
+
+FONT CONTRAST
+
+TIMINGS OF THE CLICK
+
+STUTTER!

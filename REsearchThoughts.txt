@@ -2826,7 +2826,6 @@ Is it important for the robot to have a model for humans act in a given situatio
 
 The notion of a leaky integrator controlling when an assistive robot should help might work. that is, the robot waits until it has enough evidence (regarding how bad the situation is for the human) before it decides to step in and help. 
 
-
 Think of a human caretaker helping a subject in mode switching. The caretaker gets to observe what the human is doing and make his/her own judgment regarding when to make the mode switches. 
 
 What aspects of the subjects behavior (how he controls the robot), would have caused the human to make the mode switch? Are these the same aspects that an assistive robot should be paying attention to? Would this give us insight into the important features that the assistive robot should be paying attention to and relying on to make mode switch related assistance. 
@@ -2855,5 +2854,47 @@ Side note: Can Miller et al.s work be generalized to multiple objects. If so, th
 
 Formulation 3 seems to be the most promising of all. There are some numerical issues that still persist (divide by 0 issues). However preliminary simulation results looks fairly decent and promising. 
 
+Review the intepretation and justification for using Fisher information approach for this problem. Murphey et al have an explanation of interpreting Fisher information in the context of spatial location estimation. Does my formulation fit the interpretation properly. If not, why is the case. Does this mean I am using an even more "strteched" out inteprretation of Fisher Information or is it plain wrong?
+
+In Miller et al. There is a space in which the "sensor" can move around and there is a space of all possible locations of the goal. What is the analogue of that in our case? Is there a reason why such an analogue should exist?
+
+Generalization to 3D case. 
+
+Initial simulation results looks promising and is giving sensible values. Still not completely sure whether the Fisher information metric itself is making sense. In the process of generating point cloud for uniformly sampled worksapce points. 
+
+So far, I have only been working on 1D interfaces. This makes the 'integral' easier. However, when 2D interfaces are considered, the integral has to happen along a curve (or the unit circle). 
+
+Incorporate that into the MATLAB framework:
+
+Other extension would be to have the DS based confidence module connected to this system. Challenge would be combine the numerical and the symbolic representations!
+What does it mean to have this in full 6D! The generalization of the heuristic metric to all 6D was straight forward. Is it just a matter of extending nd to 6. 
+
+Fisher info stuff is computationally expensive. Need to precompute and generalize maybe! Can we use GPs to "interpolate" properly? Stuff from optimization class?
+
+Sept 5 2017:
+
+Interactive GUI for 1D interface in 3D scenario has been implemented using formulation 3. Fairly reasonable and sensible results. 
+
+3D scenario with 2D interface has also been implemented. Computationally expensive to do the integral for the @d control command subspace. 
+
+play around with the discretization of the 2D space to make it computationally efficicent. Play around with it and make note of when it breaks. 
+
+Riemannian manifold learning. 
+The tutorial almost works perfectly except for a call to a function towards the end. 
+
+In the tutorial the demo data lives in time * S2. 
+
+In our case we will try to learn quaternion kinematics. Following SEDS type model we will try to generate quaternion 'velocities' conditioned on the current quaternion. 
+
+Data preparation: 
+
+Collect quaternion data - in S3
+Compute quaternion differences for subsequent points. The quaternion diffs would also be in S3
+
+Create a tuple with first dimension to be the quaternion diffs and second dimension to be the quaternoins themselves. 
+
+Learn GMMs on the this data struct. Vary the components. Try cross validation. See if the prediction error is close to zero. 
+
+Might have to learn new data that covers a bigger range, so that it is truly far from Euclidean. 
 
 
